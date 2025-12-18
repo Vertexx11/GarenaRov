@@ -1,0 +1,68 @@
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-header">
+      <h2>{{ mode === 'login' ? 'Welcome Back' : 'Create Account' }}</h2>
+      <p class="subtitle">{{ mode === 'login' ? 'Please sign in to continue' : 'Sign up to get started' }}</p>
+    </div>
+
+    <form [formGroup]="form" autocomplete="off" class="login-form">
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Username</mat-label>
+        <input matInput type="text" placeholder="Enter your username" (input)="updateErrorMessage('username')"
+          formControlName="username" />
+        @if (form.controls['username'].invalid) {
+        <mat-error>{{ errorMessage.username() }}</mat-error>
+        }
+      </mat-form-field>
+
+      @if (mode === 'register') {
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Display Name</mat-label>
+        <input matInput type="text" placeholder="Enter your display name" (input)="updateErrorMessage('display_name')"
+          formControlName="display_name" />
+        @if (form.controls['display_name'].invalid) {
+        <mat-error>{{ errorMessage.display_name() }}</mat-error>
+        }
+      </mat-form-field>
+      }
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" placeholder="Enter your password" (input)="updateErrorMessage('password')"
+          formControlName="password" />
+        @if (form.controls['password'].invalid) {
+        <mat-error>{{ errorMessage.password() }}</mat-error>
+        }
+      </mat-form-field>
+
+      @if (mode === 'register') {
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Confirm Password</mat-label>
+        <input matInput type="password" placeholder="Confirm your password"
+          (input)="updateErrorMessage('confirm_password')" formControlName="confirm_password" />
+        @if (form.controls['confirm_password'].invalid) {
+        <mat-error>{{ errorMessage.confirm_password() }}</mat-error>
+        }
+      </mat-form-field>
+      }
+
+      <button mat-flat-button color="primary" type="submit" class="submit-btn" [disabled]="!form.valid">
+        {{ mode === 'login' ? 'Log In' : 'Sign Up' }}
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <div class="divider">
+        <span>or</span>
+      </div>
+      <div class="toggle-text">
+        @if (mode === 'login') {
+        New here? <span class="action-link" (click)="toggleMode()">Create an account</span>
+        } @else {
+        Already have an account? <span class="action-link" (click)="toggleMode()">Log in</span>
+        }
+      </div>
+    </div>
+  </div>
+</div>
