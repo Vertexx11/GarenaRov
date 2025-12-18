@@ -1,8 +1,18 @@
+### Register
 POST http://127.0.0.1:8000/api/brawlers/register
 Content-Type: application/json
 
 {
-  "username": "menta",
+  "username": "tester_99",
   "password": "P@ssw0rd",
-  "display_name": "Menta ROV"
+  "display_name": "Tester ROV"
+}
+
+### Login
+GET http://127.0.0.1:8000/api/brawlers/login
+Content-Type: application/json
+
+{
+  "username": "tester_99",
+  "password": "P@ssw0rd"
 }
