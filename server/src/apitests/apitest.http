@@ -9,10 +9,10 @@ Content-Type: application/json
 }
 
 ### Login
-GET http://127.0.0.1:8000/api/brawlers/login
+POST http://127.0.0.1:8000/api/authentication/login
 Content-Type: application/json
 
 {
-  "username": "tester_99",
-  "password": "P@ssw0rd"
+    "username": "tester_99",
+    "password": "P@ssw0rd"
 }

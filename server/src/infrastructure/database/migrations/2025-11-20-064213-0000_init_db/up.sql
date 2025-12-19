@@ -26,6 +26,11 @@ CREATE TABLE crew_memberships (
     PRIMARY KEY (mission_id, brawler_id)
 );
 
+ALTER  TABLE
+    brawlers
+ADD
+    CONSTRAINT uq_username UNIQUE (username);
+
 ALTER TABLE
     missions
 ADD
