@@ -1,0 +1,34 @@
+### create new mission
+# @prompt mission_name Mission Name
+# @prompt description Mission Description
+POST http://127.0.0.1:8000/api/mission-management
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+
+{
+    "name": "mission",
+    "description":"comeherebro"
+}
+
+
+### update mission
+# @prompt mission_id Mission ID
+# @prompt mission_name Mission Name
+# @prompt description Mission Description
+PATCH http://127.0.0.1:8000/api/mission-management/{{mission_id}}
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+
+{
+    "name": "TestMission1",
+    "description": "comeherebro"
+}
+
+
+### remove mission
+# @prompt mission_id Mission ID
+DELETE http://127.0.0.1:8000/api/mission-management/{{mission_id}}
+Content-Type: application/json
+Authorization: Bearer {{access_token}}

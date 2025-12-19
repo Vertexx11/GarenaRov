@@ -1,7 +1,0 @@
-POST http://127.0.0.1:8000/api/brawler/register
-Content-Type: application/json
-
-{
-  "username": "menta",
-  "password":"P@sswØrd"
-}

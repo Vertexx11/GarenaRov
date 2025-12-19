@@ -1,0 +1,15 @@
+### join mission
+# @prompt mission_id Mission ID to Join
+
+POST  http://127.0.0.1:8000/api/crew-operation/join{{mission_id}}
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+
+
+### leave mission
+# @prompt mission_id Mission ID to Leave
+DELETE  http://127.0.0.1:8000/api/crew-operations/leave/{{mission_id}}
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
