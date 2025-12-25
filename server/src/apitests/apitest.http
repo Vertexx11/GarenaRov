@@ -3,7 +3,7 @@ POST http://127.0.0.1:8000/api/brawlers/register
 Content-Type: application/json
 
 {
-  "username": "mentaa",
+  "username": "new",
   "password": "P@ssw0rd",
   "display_name": "Tester ROV"
 }
@@ -13,6 +13,6 @@ POST http://127.0.0.1:8000/api/authentication/login
 Content-Type: application/json
 
 {
-    "username": "tester_88",
+    "username": "new",
     "password": "P@ssw0rd"
 }

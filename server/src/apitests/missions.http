@@ -22,13 +22,36 @@ Authorization: Bearer {{access_token}}
 
 
 {
-    "name": "TestMission1",
+    "name": "be_cometo_missunivers",
     "description": "comeherebro"
 }
-
 
 ### remove mission
 # @prompt mission_id Mission ID
 DELETE http://127.0.0.1:8000/api/mission-management/{{mission_id}}
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+### set mission to in-progress
+
+# @prompt mission_id Mission ID to Set In-Progress
+
+PATCH http://127.0.0.1:8000/api/mission/in-progress/{{mission_id}}
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+### set mission to completed
+
+# @prompt mission_id Mission ID to Set Completed
+
+PATCH http://127.0.0.1:8000/api/mission/to-completed/{{mission_id}}
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+### set mission to failed
+
+# @prompt mission_id Mission ID to Set Failed
+
+PATCH http://127.0.0.1:8000/api/mission/to-failed/{{mission_id}}
 Content-Type: application/json
 Authorization: Bearer {{access_token}}

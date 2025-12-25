@@ -3,10 +3,10 @@
 
 
 @menta = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjE1LCJleHAiOjE3NjcxNTY5NTksImlhdCI6MTc2NjU1MjE1OX0.wEkOI5V1u-p7mxT26bJ_65lXfqD-6AQuyI73iRAFJ4s
-
+@tester_88 = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjI0LCJleHAiOjE3NjcyNTA3NzksImlhdCI6MTc2NjY0NTk3OX0.r_aMMdr3oH5qbs-T0qnSIFQU369Xbj3ZrejpfwBH7sk
 POST http://127.0.0.1:8000/api/crew/join/{{mission_id}}
 Content-Type: application/json
-Authorization: Bearer {{menta}}
+Authorization: Bearer {{tester_88}}
 
 
 
