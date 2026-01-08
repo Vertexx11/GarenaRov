@@ -60,7 +60,7 @@ pub async fn get_mission_count<T>(
     State(mission_viewing_use_case): State<Arc<MissionViewingUseCase<T>>>,
     Path(mission_id): Path<i32>,
 ) -> impl IntoResponse
-where
+where   
     T: MissionViewingRepository + Send + Sync,
 {
     match mission_viewing_use_case.get_mission_count(mission_id).await {

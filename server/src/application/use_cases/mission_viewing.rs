@@ -23,6 +23,7 @@ where
         }
     }
 
+   
     pub async fn get_one(&self, mission_id: i32) -> Result<MissionModel> {
         let crew_count = self
             .mission_viewing_repository
