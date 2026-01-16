@@ -8,7 +8,7 @@ use crate::{
     },
     infrastructure::{
         argon2::hash,
-        cloudinary::{ UploadImageOptions},
+        cloudinary::{UploadImageOptions},
         jwt::jwt_model::Passport,
     },
 };
@@ -35,13 +35,18 @@ where
 
         register_model.password = hashed_password;
 
+        // เก็บ display_name ไว้ก่อน
+        let display_name_for_token = register_model.display_name.clone();
+
         let register_entity = register_model.to_entity();
 
         let brawler_id = self.brawler_repository.register(register_entity).await?;
 
-        let passport = Passport::new(brawler_id);
+        // ส่ง id และ display_name ไปสร้าง Token
+        let passport = Passport::new(brawler_id, display_name_for_token);
         Ok(passport)
     }
+
     pub async fn upload_avatar(
         &self,
         base64_image: String,

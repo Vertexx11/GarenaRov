@@ -1,23 +1,44 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatButton, MatAnchor } from "@angular/material/button";
 import { PasswordValidator } from '../_helpers/password.validator';
 import { PasswordMatchValidator } from '../_helpers/password-match.validator';
+import { PassportService } from '../_services/passport-service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule, MatFormFieldModule, MatLabel, MatInput, MatAnchor, MatButton],
-
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-
 export class Login {
   mode: 'login' | 'register' = 'login'
   form: FormGroup
 
+  private _routerService = inject(Router)
+  private _passportService = inject(PassportService)
+  errorFromServer = ''
+
+  async onSubmit(): Promise<void> {
+    try {
+      if (this.mode === 'login') {
+        this.errorFromServer = await this._passportService.get(this.form.value);
+      } else {
+
+        this.errorFromServer = await this._passportService.new(this.form.value);
+      }
+
+      if (this.errorFromServer === '') {
+        this._routerService.navigate(['/']);
+      }
+    } catch (error) {
+    
+      this.errorFromServer = 'record not found';
+    }
+  }
 
   errorMessage = {
     username: signal(''),
@@ -33,20 +54,21 @@ export class Login {
         Validators.maxLength(16),
         Validators.minLength(4)
       ]),
-
       display_name: new FormControl('', [
         Validators.required,
         Validators.maxLength(16),
         Validators.minLength(4)
       ]),
-
       password: new FormControl('', [
         Validators.required,
+        Validators.maxLength(16),
+        Validators.minLength(8),
         PasswordValidator(8, 16)
       ])
     })
-  }
 
+    this.updateForm();
+  }
 
   toggleMode() {
     this.mode = this.mode === 'login' ? 'register' : 'login'
@@ -55,16 +77,19 @@ export class Login {
 
   private updateForm(): void {
     if (this.mode === 'register') {
-      this.form.addControl('confirm_password', new FormControl('', [Validators.required]))
-      this.form.addControl('display_name', new FormControl('', [Validators.required]))
-
+      if (!this.form.contains('confirm_password')) {
+        this.form.addControl('confirm_password', new FormControl('', [Validators.required]));
+      }
+      if (!this.form.contains('display_name')) {
+        this.form.addControl('display_name', new FormControl('', [Validators.required]));
+      }
       this.form.addValidators(PasswordMatchValidator('password', 'confirm_password'))
     } else {
       this.form.removeControl('confirm_password')
       this.form.removeControl('display_name')
+      this.form.removeValidators(PasswordMatchValidator('password', 'confirm_password'))
     }
-
-    this.form.removeValidators(PasswordMatchValidator('password', 'confirm_password'))
+    this.form.updateValueAndValidity();
   }
 
   updateErrorMessage(ctrlName: string): void {

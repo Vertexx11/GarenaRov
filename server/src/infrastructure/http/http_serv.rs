@@ -6,7 +6,7 @@ use axum::{
     http::{
         Method, StatusCode,
         header::{AUTHORIZATION, CONTENT_TYPE},
-    },
+    }, routing::get,
 };
 use tokio::net::TcpListener;
 use tower_http::{
@@ -55,6 +55,7 @@ fn api_serve(db_pool: Arc<PgPoolSquad>) -> Router {
             "/view",
             routers::mission_viewing::routes(Arc::clone(&db_pool)),
         )
+        .route("/error/{status_code_u16}", get(routers::default::error))
         .fallback(|| async { (StatusCode::NOT_FOUND, "API not found") })
 }
 

@@ -8,7 +8,11 @@ import { Login } from './login/login';
 export const routes: Routes = [
     {path: '', component:Home},
     {path: 'login', component:Login},
-    {path: 'profile', component:Profile},
     {path: 'server-error', component: ServerError},
-    {path: '**', component:NotFound}
+    {path: '**', component:NotFound},
+    {path: 'profile', 
+        component:Profile,
+        runGuardsAndResolvers: 'always',
+        canActivate: []
+    },
 ];

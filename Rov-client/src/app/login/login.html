@@ -5,9 +5,7 @@
       <p class="subtitle">{{ mode === 'login' ? 'Please sign in to continue' : 'Sign up to get started' }}</p>
     </div>
 
-    <form [formGroup]="form" autocomplete="off" class="login-form">
-
-      <mat-form-field appearance="fill" class="full-width">
+    <form [formGroup]="form" autocomplete="off" class="login-form" (ngSubmit)="onSubmit()"> <mat-form-field appearance="fill" class="full-width">
         <mat-label>Username</mat-label>
         <input matInput type="text" placeholder="Enter your username" (input)="updateErrorMessage('username')"
           formControlName="username" />
@@ -47,6 +45,11 @@
       </mat-form-field>
       }
 
+      @if (errorFromServer !== '') {
+        <div class="server-error-msg" style="color: red; text-align: center; margin-bottom: 10px; font-size: 0.9em;">
+            <i class="fa-solid fa-circle-exclamation"></i> {{ errorFromServer }}
+        </div>
+      }
       <button mat-flat-button color="primary" type="submit" class="submit-btn" [disabled]="!form.valid">
         {{ mode === 'login' ? 'Log In' : 'Sign Up' }}
       </button>
