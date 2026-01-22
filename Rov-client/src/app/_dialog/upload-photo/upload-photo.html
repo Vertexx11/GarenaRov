@@ -1,23 +1,46 @@
-<h4 mat-dialog-title>Upload Photo</h4>
+<h2 mat-dialog-title class="dialog-title">อัปโหลดรูปโปรไฟล์</h2>
+
 <mat-dialog-content>
   <div class="content-container">
-    @if(imgPreview()){
-    <div class="image-preview">
-      <img [src]="imgPreview()" alt="upload photo">
+
+    <div class="preview-box" [class.has-image]="imgPreview()">
+      @if(imgPreview()){
+        <img [src]="imgPreview()" alt="upload photo" class="preview-img">
+      } @else {
+        <div class="empty-state">
+          <mat-icon class="upload-icon">cloud_upload</mat-icon>
+          <span>ยังไม่ได้เลือกไฟล์</span>
+        </div>
+      }
     </div>
-    }
+
     @if(imgFile){
-    <p>{{imgFile.name}}</p>
+      <div class="file-info">
+        <mat-icon>image</mat-icon>
+        <span>{{imgFile.name}}</span>
+      </div>
     }
+
     @if(errorMessage()){
-    <p class="error-msg">{{errorMessage()}}</p>
+      <div class="error-box">
+        <mat-icon>error</mat-icon>
+        <span>{{errorMessage()}}</span>
+      </div>
     }
-  </div>แ
 
-  <input type="file" #filePicker (change)="onImagePicked($event)" accept=".jpg, .png, .jpeg">
+    <input type="file" #filePicker (change)="onImagePicked($event)" accept=".jpg, .png, .jpeg" style="display: none;">
 
-  <mat-dialog-actions>
-    <button type="button" mat-stroked-button (click)="filePicker.click()">Pick Image</button>
-    <button (click)="onSubmit()" mat-stroked-button type="submit" [disabled]="!imgFile"> Upload</button>
-  </mat-dialog-actions>
+  </div>
 </mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button type="button" mat-stroked-button (click)="filePicker.click()">
+    <mat-icon>folder_open</mat-icon>
+    เลือกรูปภาพ
+  </button>
+  
+  <button (click)="onSubmit()" mat-flat-button color="primary" type="submit" [disabled]="!imgFile">
+    <mat-icon>check</mat-icon>
+    อัปโหลด
+  </button>
+</mat-dialog-actions>

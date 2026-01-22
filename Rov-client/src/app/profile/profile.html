@@ -1,6 +1,13 @@
-<p>profile works!</p>
-<img [src]="avatar_url()" alt="avatar" />
+<div class="profile-container">
+  
+  <div class="avatar-wrapper">
+    <img [src]="avatar_url()" alt="User Avatar" class="avatar-img" />
 
-<div class="upload-photo">
-    <button mat-raised-button (click)="openDialog()"><mat-icon>add</mat-icon> new avatar</button>
+    <button mat-mini-fab color="primary" class="edit-btn" (click)="openDialog()">
+      <mat-icon>edit</mat-icon>
+    </button>
+  </div>
+
+  <h2 class="profile-name">Your Profile!</h2>
+
 </div>

@@ -1,1 +1,41 @@
-<p>missions works!</p>
+<div class="main-container">
+  <h2>🕵️ Mission Control</h2>
+
+  <div class="filter-card">
+    <div class="input-group">
+      <label>Mission Name</label>
+      <input type="text" [(ngModel)]="filter.name" placeholder="ค้นหาชื่อภารกิจ..." class="styled-input">
+    </div>
+
+    <div class="input-group">
+      <label>Status</label>
+      <select [(ngModel)]="filter.status" class="styled-select">
+        <option value="">-- ทั้งหมด --</option>
+        <option value="Open">🔵 Open</option>
+        <option value="InProgress">🟡 In Progress</option>
+        <option value="Completed">🟢 Completed</option>
+        <option value="Failed">🔴 Failed</option>
+      </select>
+    </div>
+
+    <button (click)="onSubmit()" class="search-btn">
+      ค้นหา
+    </button>
+  </div>
+
+  <hr class="divider">
+
+  <div class="result-area">
+    <h3>ผลลัพธ์ ({{ missions.length }} รายการ):</h3>
+    
+    @if(missions.length > 0) {
+      <div class="json-box">
+        <pre>{{ missions | json }}</pre>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <p>ไม่พบข้อมูล หรือยังไม่ได้กดค้นหา</p>
+      </div>
+    }
+  </div>
+</div>

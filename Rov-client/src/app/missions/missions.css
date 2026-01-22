@@ -1,0 +1,100 @@
+/* คอนเทนเนอร์หลัก */
+.main-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: 'Sarabun', sans-serif; /* หรือฟอนต์ที่คุณใช้ */
+}
+
+h2 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* การ์ดตัวกรอง */
+.filter-card {
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  display: flex;
+  gap: 15px;
+  align-items: flex-end; /* จัดให้ปุ่มอยู่ระดับเดียวกับ Input */
+  flex-wrap: wrap;
+}
+
+/* กลุ่ม Input แต่ละตัว */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1; /* ขยายให้เต็มพื้นที่ */
+  min-width: 200px;
+}
+
+label {
+  font-size: 14px;
+  color: #666;
+  font-weight: 600;
+}
+
+/* ช่องกรอกและเลือก */
+.styled-input, .styled-select {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.styled-input:focus, .styled-select:focus {
+  border-color: #2196f3;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+/* ปุ่มค้นหา */
+.search-btn {
+  padding: 12px 24px;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+  height: 45px; /* ความสูงเท่ากับ Input */
+}
+
+.search-btn:hover {
+  background-color: #1976d2;
+}
+
+/* ส่วนผลลัพธ์ */
+.result-area {
+  margin-top: 20px;
+}
+
+.json-box {
+  background-color: #2d2d2d;
+  color: #4caf50;
+  padding: 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.empty-state {
+  text-align: center;
+  color: #999;
+  padding: 40px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border: 2px dashed #eee;
+}
+
+.divider {
+  margin: 30px 0;
+  border: 0;
+  border-top: 1px solid #eee;
+}

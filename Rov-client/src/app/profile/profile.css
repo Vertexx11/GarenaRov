@@ -1,0 +1,43 @@
+/* คอนเทนเนอร์หลัก จัดทุกอย่างให้อยู่ตรงกลาง */
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px; /* เว้นระยะจากด้านบน */
+  gap: 20px;
+}
+
+/* กรอบหุ้มรูปและปุ่ม */
+.avatar-wrapper {
+  position: relative; /* สำคัญ! เพื่อให้ปุ่มอ้างอิงตำแหน่งจากกล่องนี้ */
+  width: 180px;      /* กำหนดขนาดรูป */
+  height: 180px;
+}
+
+/* ตัวรูปภาพ */
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;  /* ให้รูปเต็มกรอบโดยไม่เบี้ยว */
+  border-radius: 50%; /* ทำเป็นวงกลม */
+  border: 5px solid #ffffff; /* ขอบสีขาว */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* เงานุ่มๆ */
+  background-color: #f0f0f0; /* สีพื้นหลังกันรููปโหลดไม่ทัน */
+}
+
+/* ปุ่มแก้ไข */
+.edit-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  /* เพิ่มเงาให้ปุ่มดูเด่น */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important; 
+}
+
+/* ชื่อโปรไฟล์ */
+.profile-name {
+  color: #333;
+  font-size: 24px;
+  font-weight: 500;
+  margin: 0;
+}

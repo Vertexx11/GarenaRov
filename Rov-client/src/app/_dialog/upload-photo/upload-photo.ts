@@ -2,11 +2,12 @@ import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/cor
 import { MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { fileTypeFromBlob } from 'file-type';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-upload-photo',
   standalone: true, 
-  imports: [MatDialogTitle, MatDialogContent, MatDialogActions, MatButtonModule],
+  imports: [MatDialogTitle, MatDialogContent, MatDialogActions, MatButtonModule, MatIconModule],
   templateUrl: './upload-photo.html',
   styleUrl: './upload-photo.css',
   changeDetection: ChangeDetectionStrategy.OnPush

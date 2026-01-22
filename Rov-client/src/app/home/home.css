@@ -1,0 +1,120 @@
+/* คอนเทนเนอร์หลัก */
+.home-container {
+    min-height: 100vh;
+    background-color: #f5f7fa; /* สีพื้นหลังหลัก */
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Hero Section --- */
+.hero-section {
+    background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%); /* ไล่สีน้ำเงินเข้ม */
+    color: white;
+    padding: 80px 20px;
+    text-align: center;
+    border-bottom-left-radius: 50px;
+    border-bottom-right-radius: 50px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+    letter-spacing: -1px;
+}
+
+.highlight {
+    color: #ffd700; /* สีทอง */
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 40px;
+    font-weight: 300;
+}
+
+/* ปุ่มกดใน Hero */
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.btn-large {
+    padding: 24px 32px !important; /* ขยายปุ่มให้ใหญ่ */
+    font-size: 1.1rem !important;
+    border-radius: 50px !important;
+}
+
+.btn-outline {
+    color: white !important;
+    border-color: rgba(255,255,255,0.5) !important;
+}
+
+/* --- Features Section --- */
+.features-section {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 60px 20px;
+    flex-wrap: wrap;
+    margin-top: -40px; /* ดันขึ้นไปเกยกับ Hero นิดนึงให้ดูมีมิติ */
+}
+
+/* การ์ดแต่ละใบ */
+.feature-card {
+    background: white;
+    width: 280px;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+/* เอฟเฟกต์ตอนเอาเมาส์ชี้ */
+.feature-card:hover {
+    transform: translateY(-10px); /* ลอยขึ้น */
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.feature-card h3 {
+    margin: 20px 0 10px;
+    font-size: 1.25rem;
+    color: #333;
+}
+
+.feature-card p {
+    color: #666;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+/* ไอคอนสวยๆ */
+.icon-wrapper {
+    width: 70px;
+    height: 70px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    font-size: 32px;
+}
+
+/* สีพื้นหลังไอคอนแต่ละอัน */
+.color-1 { background-color: #e3f2fd; color: #1565c0; }
+.color-2 { background-color: #e8f5e9; color: #2e7d32; }
+.color-3 { background-color: #fff3e0; color: #ef6c00; }
+
+/* Responsive สำหรับมือถือ */
+@media (max-width: 600px) {
+    .title { font-size: 2.5rem; }
+    .hero-section { border-radius: 0 0 30px 30px; }
+    .features-section { margin-top: 0; }
+    .cta-buttons { flex-direction: column; }
+}
