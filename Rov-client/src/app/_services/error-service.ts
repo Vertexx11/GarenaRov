@@ -21,13 +21,7 @@ export class ErrorService {
     if (error) {
       switch (error.status) {
         case 400:
-          if (error.error && error.error.message) {
-            this._snackBar.open(error.error.message, 'ok', this._snackBarConfig);
-          } else if (error.message) {
-            this._snackBar.open(error.message, 'ok', this._snackBarConfig);
-          } else {
-            this._snackBar.open('Bad Request', 'ok', this._snackBarConfig);
-          }
+          this._snackBar.open('record not found', 'ok', this._snackBarConfig);
           break;
 
         case 401:

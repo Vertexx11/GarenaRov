@@ -31,10 +31,7 @@ export class Navbar {
   constructor() {
     this.display_name = computed(() => this._passportService.data()?.user?.display_name);
     
-    this.avatar_url = computed(() => {
-        const url = this._passportService.data()?.user?.avatar_url;
-        return this.getAvatar(url);
-    });
+    this.avatar_url = computed(() => this._passportService.image())
   }
  
   logout() {
@@ -42,9 +39,13 @@ export class Navbar {
       this._routerService.navigate(['/']);
   }
 
-  private getAvatar(url: string | undefined): string {
-      if (url) return url;
-      return `https://ui-avatars.com/api/?name=${this.display_name() || 'User'}&background=random`;
+private getAvatar(url: string | undefined): string {
+      if (url) {
+          if (url.startsWith('http')) {
+              return url; 
+          }
+          return `assets/${url}`;
+      }
+      return `assets/anonymous_128.png`;
   }
-  
 }

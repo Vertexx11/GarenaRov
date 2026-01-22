@@ -9,10 +9,10 @@ export const routes: Routes = [
     {path: '', component:Home},
     {path: 'login', component:Login},
     {path: 'server-error', component: ServerError},
-    {path: '**', component:NotFound},
     {path: 'profile', 
         component:Profile,
         runGuardsAndResolvers: 'always',
         canActivate: []
     },
+    {path: '**', component:NotFound},
 ];

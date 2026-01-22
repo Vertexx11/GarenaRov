@@ -3,6 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom, Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { getAvatar } from '../_helpers/avatar'; 
 
 export interface LoginData {
   username?: string;
@@ -12,11 +13,11 @@ export interface LoginData {
 }
 
 export interface Passport {
+  avatar_url: string;
   access_token: string;
   expires_in?: number;
   token_type?: string;
   user?: {
-
     display_name: string;
     avatar_url?: string;
   };
@@ -34,6 +35,19 @@ export class PassportService {
 
   data = signal<Passport | undefined>(undefined);
 
+  image = signal<string>(""); 
+
+  saveAvatarImage(url: string) {
+      let passport = this.data();
+      if (passport ) {
+        passport.avatar_url = url;
+        this.data.set(passport);
+        this.savePassportToLocalStorage();
+        
+        this.image.set(url); 
+      }
+  }
+
   constructor() {
     if (isPlatformBrowser(this._platformId)) {
       this.getPassportFromLocalStorage();
@@ -43,7 +57,6 @@ export class PassportService {
   async new(registerData: LoginData): Promise<string> {
     try {
       const url = this._api_url + '/brawlers/register';
-
       const { confirm_password, ...payload } = registerData;
 
       console.log('Register Payload:', payload);
@@ -52,6 +65,8 @@ export class PassportService {
       const passport: Passport = await firstValueFrom(source);
 
       this.data.set(passport);
+      
+      this.image.set(getAvatar(passport.avatar_url));
 
       this.savePassportToLocalStorage();
       return '';
@@ -66,23 +81,27 @@ export class PassportService {
       localStorage.removeItem(this._storage_key);
     }
     this.data.set(undefined);
+    this.image.set("");
   }
 
   async get(loginData: LoginData): Promise<string> {
     try {
       const url = this._api_url + '/authentication/login';
-
       const source: Observable<Passport> = this._http.post<Passport>(url, loginData);
-
       const passport: Passport = await firstValueFrom(source);
 
       this.data.set(passport);
+      
+      this.image.set(getAvatar(passport.avatar_url));
 
       this.savePassportToLocalStorage();
 
       return '';
     } catch (error: any) {
-      return error.error?.message || error.message || 'Login failed';
+      if (error.status === 400) {
+        return 'Invalid username or password';
+      }
+      return error.error?.message || 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ'; 
     }
   }
 
@@ -94,6 +113,9 @@ export class PassportService {
     try {
       const passport: Passport = JSON.parse(jsonStr) as Passport;
       this.data.set(passport);
+      
+      this.image.set(getAvatar(this.data()?.avatar_url));
+
     } catch (error) {
       console.error(error);
     }

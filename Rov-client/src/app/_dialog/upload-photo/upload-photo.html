@@ -1,0 +1,23 @@
+<h4 mat-dialog-title>Upload Photo</h4>
+<mat-dialog-content>
+  <div class="content-container">
+    @if(imgPreview()){
+    <div class="image-preview">
+      <img [src]="imgPreview()" alt="upload photo">
+    </div>
+    }
+    @if(imgFile){
+    <p>{{imgFile.name}}</p>
+    }
+    @if(errorMessage()){
+    <p class="error-msg">{{errorMessage()}}</p>
+    }
+  </div>แ
+
+  <input type="file" #filePicker (change)="onImagePicked($event)" accept=".jpg, .png, .jpeg">
+
+  <mat-dialog-actions>
+    <button type="button" mat-stroked-button (click)="filePicker.click()">Pick Image</button>
+    <button (click)="onSubmit()" mat-stroked-button type="submit" [disabled]="!imgFile"> Upload</button>
+  </mat-dialog-actions>
+</mat-dialog-content>

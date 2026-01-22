@@ -35,7 +35,7 @@ export class Login {
         this._routerService.navigate(['/']);
       }
     } catch (error) {
-    
+
       this.errorFromServer = 'record not found';
     }
   }

@@ -1,1 +1,6 @@
 <p>profile works!</p>
+<img [src]="avatar_url()" alt="avatar" />
+
+<div class="upload-photo">
+    <button mat-raised-button (click)="openDialog()"><mat-icon>add</mat-icon> new avatar</button>
+</div>
