@@ -1,0 +1,13 @@
+/* จัด Layout ให้เป็นแนวตั้ง และกำหนดความกว้างขั้นต่ำ */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  min-width: 400px; /* ปรับขนาดความกว้างของหน้าต่างตรงนี้ */
+  padding-top: 10px;
+}
+
+/* สั่งให้ Input กว้างเต็มพื้นที่ 100% */
+.full-width {
+  width: 100%;
+  margin-bottom: 5px; /* เว้นระยะห่างระหว่างบรรทัดนิดนึง */
+}

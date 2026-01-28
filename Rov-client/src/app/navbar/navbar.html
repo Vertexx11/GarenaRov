@@ -9,6 +9,13 @@
     <span>Missions</span>
   </button>
 
+  @if (display_name()) {
+    <button mat-button routerLink="/missions/my-missions" routerLinkActive="active">
+       <mat-icon>list_alt</mat-icon>
+       <span>My Missions</span>
+    </button>
+  }
+
   <span class="spacer"></span>
 
   @if (display_name() === undefined) {

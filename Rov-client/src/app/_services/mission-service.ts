@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { MissionFilter } from '../_models/mission-filter';
 import { Mission } from '../_models/mission';
+import { AddMission } from '../_models/add-mission';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,20 @@ import { Mission } from '../_models/mission';
 export class MissionService {
   private _api_url = environment.baseUrl + 'api/v1'; 
   private _http = inject(HttpClient);
+
+  async getMyMissions(): Promise<Mission[]> {
+    const url = this._api_url + '/brawlers/my-missions';
+    const observable = this._http.get<Mission[]>(url);
+    const missions = await firstValueFrom(observable);
+    return missions;
+  }
+
+  async add(mission: AddMission): Promise<number> {
+    const url = this._api_url + '/mission-management';
+    const observable = this._http.post<{mission_id: number}>(url, mission);
+    const response = await firstValueFrom(observable);
+    return response.mission_id;
+  }
 
   async gets(filter: MissionFilter): Promise<Mission[]> {
     const queryString = this.toQueryString(filter);

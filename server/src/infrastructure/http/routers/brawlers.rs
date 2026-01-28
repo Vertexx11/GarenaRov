@@ -1,11 +1,7 @@
 use std::sync::Arc;
 
 use axum::{
-    extract::{Extension, State},
-    http::StatusCode,
-    response::IntoResponse,
-    routing::post,
-    Json, Router,
+    Json, Router, extract::{Extension, State}, http::StatusCode, response::IntoResponse, routing::{get, post}
 };
 
 use crate::{
@@ -19,24 +15,22 @@ use crate::{
     },
 };
 
-// 1. แก้ฟังก์ชัน routes: รับ PgPoolSquad ตรงๆ (เลิกใช้ <T>)
 pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
-    // สร้าง Repository จาก DB Pool
     let brawlers_repository = BrawlerPostgres::new(db_pool);
-    // สร้าง UseCase โดยยัด Repository เข้าไป
     let brawlers_use_case = BrawlersUseCase::new(Arc::new(brawlers_repository));
 
     let protected_router = Router::new()
         .route("/avatar", post(upload_avatar))
+        .route("/my-missions", get(get_missions))
         .route_layer(axum::middleware::from_fn(authorization));
 
     Router::new()
         .merge(protected_router)
         .route("/register", post(register))
-        .with_state(Arc::new(brawlers_use_case)) // state จะเป็น Arc<BrawlersUseCase<BrawlerPostgres>>
+        .with_state(Arc::new(brawlers_use_case)) 
 }
 
-// 2. แก้ฟังก์ชัน register: ระบุชนิด UseCase ให้ชัดเจน (BrawlerPostgres)
+
 pub async fn register(
     State(brawlers_use_case): State<Arc<BrawlersUseCase<BrawlerPostgres>>>,
     Json(register_brawler_model): Json<RegisterBrawlerModel>,
@@ -47,7 +41,7 @@ pub async fn register(
     }
 }
 
-// 3. แก้ฟังก์ชัน upload_avatar: ระบุชนิด UseCase ให้ชัดเจนเช่นกัน
+
 pub async fn upload_avatar(
     State(brawlers_use_case): State<Arc<BrawlersUseCase<BrawlerPostgres>>>,
     Extension(brawler_id): Extension<i32>,
@@ -60,4 +54,12 @@ pub async fn upload_avatar(
         Ok(uploaded_image) => (StatusCode::CREATED, Json(uploaded_image)).into_response(),
         Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }
+}
+
+
+pub async fn get_missions(
+    State(_brawlers_use_case): State<Arc<BrawlersUseCase<BrawlerPostgres>>>,
+    Extension(_brawler_id): Extension<i32>,
+) -> impl IntoResponse {
+    (StatusCode::OK, Json(serde_json::json!({})))
 }

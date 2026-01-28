@@ -28,7 +28,7 @@ export interface Passport {
 })
 export class PassportService {
   private _storage_key = 'passport';
-  private _api_url = environment.baseUrl + 'api';
+  private _api_url = environment.baseUrl + 'api/v1';
   private _http = inject(HttpClient);
 
   private _platformId = inject(PLATFORM_ID);

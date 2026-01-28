@@ -68,4 +68,12 @@ impl BrawlerRepository for BrawlerPostgres {
 
         Ok(uploaded_image)
     }
+
+    async fn crew_counting(&self, mission_id: i32) -> Result<i32> {
+        todo!()
+    }
+
+    async fn get_missions(&self, brawler_id: i32) -> Result<Vec<crate::domain::entities::missions::MissionEntity>> {
+        todo!()
+    }
 }

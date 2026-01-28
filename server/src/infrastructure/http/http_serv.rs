@@ -55,6 +55,7 @@ fn api_serve(db_pool: Arc<PgPoolSquad>) -> Router {
             "/view",
             routers::mission_viewing::routes(Arc::clone(&db_pool)),
         )
+
         .route("/error/{status_code_u16}", get(routers::default::error))
         .fallback(|| async { (StatusCode::NOT_FOUND, "API not found") })
 }
@@ -62,7 +63,7 @@ fn api_serve(db_pool: Arc<PgPoolSquad>) -> Router {
 pub async fn start(config: Arc<DotEnvyConfig>, db_pool: Arc<PgPoolSquad>) -> Result<()> {
     let app = Router::new()
         .merge(static_serve())
-        .nest("/api", api_serve(Arc::clone(&db_pool)))
+        .nest("/api/v1", api_serve(Arc::clone(&db_pool)))
         // .fallback(default_router::health_check)
         // .route("/health_check", get(routers::default::health_check))
         .layer(TimeoutLayer::new(Duration::from_secs(
