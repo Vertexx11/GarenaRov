@@ -12,6 +12,9 @@ export class LoadingService {
   private injector = inject(EnvironmentInjector);
 
   loading(): void {
+    // ✅ เพิ่มบรรทัดนี้: ป้องกัน Error document is not defined
+    if (typeof document === 'undefined') return;
+
     this.loadingRequestCount++;
 
     if (this.loadingRequestCount <= 0) return;
@@ -20,23 +23,20 @@ export class LoadingService {
       this.loadingComponentRef = createComponent(Loading, {
         environmentInjector: this.injector
       });
-
-      // Attach to the view
       document.body.appendChild(this.loadingComponentRef.location.nativeElement);
-      
-      // Attach to the change detection
       this.appRef.attachView(this.loadingComponentRef.hostView);
     }
 
-    // Show the loading spinner
     this.loadingComponentRef.instance.show();
   }
 
   idle(): void {
+    // ✅ เพิ่มบรรทัดนี้ด้วย
+    if (typeof document === 'undefined') return;
+
     this.loadingRequestCount--;
 
     if (this.loadingRequestCount > 0) return;
-
     if (this.loadingComponentRef === null) return;
 
     this.loadingComponentRef.instance.hide();

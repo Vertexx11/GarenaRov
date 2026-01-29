@@ -29,13 +29,28 @@ export class MissionService {
 
   async gets(filter: MissionFilter): Promise<Mission[]> {
     const queryString = this.toQueryString(filter);
-    
     const url = this._api_url + '/view/gets?' + queryString; 
-    
     const observable = this._http.get<Mission[]>(url);
     const missions = await firstValueFrom(observable);
     return missions;
   }
+
+  async join(missionId: number): Promise<any> {
+    const url = `${this._api_url}/mission-management/${missionId}/join`;
+    return await firstValueFrom(this._http.post(url, {}, { responseType: 'text' }));
+  }
+
+  async update(id: number, data: AddMission): Promise<any> {
+    const url = `${this._api_url}/mission-management/${id}`;
+    return await firstValueFrom(this._http.put(url, data));
+  }
+
+  async delete(id: number): Promise<any> {
+    const url = `${this._api_url}/mission-management/${id}`;
+    return await firstValueFrom(this._http.delete(url, { responseType: 'text' }));
+  }
+
+
 
   private toQueryString(filter: MissionFilter): string {
     const params: string[] = [];

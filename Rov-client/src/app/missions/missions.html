@@ -1,41 +1,79 @@
-<div class="main-container">
-  <h2>🕵️ Mission Control</h2>
-
-  <div class="filter-card">
-    <div class="input-group">
-      <label>Mission Name</label>
-      <input type="text" [(ngModel)]="filter.name" placeholder="ค้นหาชื่อภารกิจ..." class="styled-input">
+<div class="mission-container">
+  
+  <div class="search-card">
+    <div class="header-title">
+      <span class="icon">🚀</span> Mission Control
     </div>
+    
+    <div class="search-form">
+      <div class="input-group">
+        <input type="text" 
+               [ngModel]="filter.name" 
+               (ngModelChange)="filter.name = $event; onSubmit()" 
+               placeholder="ค้นหาชื่อภารกิจ..." 
+               class="form-control">
+      </div>
+      
+      <div class="input-group">
+        <select [ngModel]="filter.status" 
+                (ngModelChange)="filter.status = $event; onSubmit()"
+                class="form-control status-select">
+          <option value="">-- ทั้งหมด --</option>
+          <option value="Open">🔵 Open</option>
+          <option value="InProgress">🟡 In Progress</option>
+          <option value="Completed">🟢 Completed</option>
+          <option value="Closed">🔴 Closed</option>
+        </select>
+      </div>
 
-    <div class="input-group">
-      <label>Status</label>
-      <select [(ngModel)]="filter.status" class="styled-select">
-        <option value="">-- ทั้งหมด --</option>
-        <option value="Open">🔵 Open</option>
-        <option value="InProgress">🟡 In Progress</option>
-        <option value="Completed">🟢 Completed</option>
-        <option value="Failed">🔴 Failed</option>
-      </select>
+      <button (click)="onSubmit()" class="btn-search">
+        ค้นหา
+      </button>
     </div>
-
-    <button (click)="onSubmit()" class="search-btn">
-      ค้นหา
-    </button>
   </div>
 
-  <hr class="divider">
-
-  <div class="result-area">
-    <h3>ผลลัพธ์ ({{ missions.length }} รายการ):</h3>
-    
-    @if(missions.length > 0) {
-      <div class="json-box">
-        <pre>{{ missions | json }}</pre>
-      </div>
-    } @else {
-      <div class="empty-state">
-        <p>ไม่พบข้อมูล หรือยังไม่ได้กดค้นหา</p>
-      </div>
-    }
+  <div class="results-card">
+    <div class="table-responsive">
+      <table class="mission-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>MISSION NAME</th>
+            <th>DESCRIPTION</th>
+            <th>CHIEF ID</th>
+            <th>CREW</th>
+            <th>STATUS</th>
+            <th>CREATED AT</th>
+            <th>ACTION</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (mission of missions; track mission.id) {
+            <tr>
+              <td class="text-muted">#{{ mission.id }}</td>
+              <td class="fw-bold">{{ mission.name }}</td>
+              <td class="text-desc">{{ mission.description || '-' }}</td>
+              <td><div class="chief-badge">👮 {{ mission.chief_id }}</div></td>
+              <td>{{ mission.crew_count }} / 3</td>
+              <td>
+                <span class="status-badge" [ngClass]="{'open': mission.status === 'Open'}">
+                  {{ mission.status }}
+                </span>
+              </td>
+              <td class="text-date">{{ mission.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>
+                @if (mission.crew_count >= 3) {
+                   <button class="btn-join disabled" disabled>Full</button>
+                } @else {
+                   <button class="btn-join" (click)="joinMission(mission.id)">Join</button>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="8" class="no-data">ไม่พบข้อมูลภารกิจ</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>

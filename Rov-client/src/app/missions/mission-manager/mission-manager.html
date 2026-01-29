@@ -1,19 +1,119 @@
-<div class="new-mission">
-  <button mat-raised-button (click)="openDialog()">
-    <mat-icon>add</mat-icon> new mission
-  </button>
-</div>
+<div class="dashboard-container">
+  
+  <div class="page-header">
+    <h2>My Missions</h2>
+    <button mat-raised-button color="primary" (click)="openDialog()">
+      <mat-icon>add</mat-icon> New Mission
+    </button>
+  </div>
 
-@if (myMissions$ | async; as missions) {
-  @for (mission of missions; track mission.id) {
-    <div>
-      <span style="padding-left: 1rem;">{{mission.id}}</span>
-      <span style="padding-left: 1rem;">{{mission.name}}</span>
-      <span style="padding-left: 1rem;">{{mission.description}}</span>
-      <span style="padding-left: 1rem;">{{mission.chief_id}}</span>
-      <span style="padding-left: 1rem;">{{mission.crew_count}}</span>
-      <span style="padding-left: 1rem;">{{mission.created_at | date:'short'}}</span>
-      <span style="padding-left: 1rem;">{{mission.updated_at | date:'short'}}</span>
+  <div class="stats-grid">
+    <div class="stat-card" style="border-top-color: #E5E7EB;">
+      <div class="stat-label">TOTAL MISSIONS</div>
+      <div class="stat-value">{{ stats.total }}</div>
     </div>
-  }
-}
+    
+    <div class="stat-card" style="border-top-color: #8B5CF6;">
+      <div class="stat-label">LEADING</div>
+      <div class="stat-value">{{ stats.leading }}</div>
+    </div>
+
+    <div class="stat-card" style="border-top-color: #14B8A6;">
+      <div class="stat-label">JOINED</div>
+      <div class="stat-value">{{ stats.joined }}</div>
+    </div>
+
+    <div class="stat-card" style="border-top-color: #FBBF24;">
+      <div class="stat-label">OPEN JOBS</div>
+      <div class="stat-value">{{ stats.open }}</div>
+    </div>
+  </div>
+
+  <div class="section-container">
+    <div class="section-title">
+      <div class="bar purple"></div>
+      <h3>Missions You're Leading</h3>
+    </div>
+
+    <div class="table-card">
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>NAME</th>
+            <th>DESCRIPTION</th>
+            <th>STATUS</th>
+            <th>CREW</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (mission of leadingMissions; track mission.id) {
+            <tr>
+              <td class="fw-bold">{{ mission.name }}</td>
+              <td class="text-desc">{{ mission.description }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="{
+                  'open': mission.status === 'Open',
+                  'completed': mission.status === 'Completed'
+                }">{{ mission.status }}</span>
+              </td>
+              <td>{{ mission.crew_count }} / 3</td>
+              <td>
+                <div class="actions">
+                  <button class="icon-btn edit" (click)="onEdit(mission)">✏️</button>
+                  <button class="icon-btn delete" (click)="onDelete(mission)">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+             <tr><td colspan="5" class="empty-text">คุณยังไม่ได้สร้างภารกิจใดๆ</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-container">
+    <div class="section-title">
+      <div class="bar blue"></div>
+      <h3>Joined Missions</h3>
+    </div>
+
+    <div class="table-card">
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>NAME</th>
+            <th>DESCRIPTION</th>
+            <th>CHIEF ID</th>
+            <th>STATUS</th>
+            <th>JOINED AT</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (mission of joinedMissions; track mission.id) {
+            <tr>
+              <td class="fw-bold">{{ mission.name }}</td>
+              <td class="text-desc">{{ mission.description }}</td>
+              <td>👮 {{ mission.chief_id }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="{
+                  'open': mission.status === 'Open',
+                  'completed': mission.status === 'Completed'
+                }">{{ mission.status }}</span>
+              </td>
+              <td class="text-muted">{{ mission.created_at | date:'MM/dd/yy' }}</td>
+              <td>
+                <button class="btn-leave" (click)="onLeave(mission)">Leave</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="empty-text">คุณยังไม่ได้เข้าร่วมภารกิจใดๆ</td></tr>
+         }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
