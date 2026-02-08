@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core'; // ✅ 1. เพิ่ม OnInit และ ChangeDetectorRef
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { AsyncPipe, DatePipe, NgClass, JsonPipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -23,10 +23,10 @@ import { MissionService } from '../../_services/mission-service';
   templateUrl: './mission-manager.html',
   styleUrl: './mission-manager.css',
 })
-export class MissionManager implements OnInit { // ✅ 2. เพิ่ม implements OnInit
+export class MissionManager implements OnInit {
   private _missionService = inject(MissionService);
   private _dialog = inject(MatDialog);
-  private cdr = inject(ChangeDetectorRef); // ✅ 3. ฉีดตัวกระตุ้น (ChangeDetectorRef)
+  private cdr = inject(ChangeDetectorRef);
   
   get myUserId(): number {
     const userStr = localStorage.getItem('user');
@@ -40,12 +40,34 @@ export class MissionManager implements OnInit { // ✅ 2. เพิ่ม implem
     total: 0, leading: 0, joined: 0, open: 0
   };
 
-  // ❌ ลบ constructor เดิมออก (ปล่อยว่างไว้)
   constructor() {}
-
-  // ✅ 4. ย้ายคำสั่งโหลดมาไว้ที่นี่ (ทำงานเมื่อหน้าพร้อม)
+  
   ngOnInit() {
     this.loadMyMission();
+  }
+
+  onEdit(mission: Mission) {
+    const ref = this._dialog.open(NewMission, {
+      width: '500px',
+      data: { ...mission } 
+    });
+
+    ref.afterClosed().subscribe(async (result: any) => {
+      if (!result) return; 
+
+      try {
+        await this._missionService.update(mission.id, result);
+        
+        alert('✅ แก้ไขข้อมูลสำเร็จ!');
+        await this.loadMyMission(); 
+        
+      } catch (error: any) {
+        console.error('Update failed:', error);
+        
+        const errorMessage = error.error?.message || error.message || JSON.stringify(error);
+        alert('❌ แก้ไขไม่สำเร็จ: ' + errorMessage);
+      }
+    });
   }
 
   async onDelete(mission: Mission) {
@@ -59,25 +81,6 @@ export class MissionManager implements OnInit { // ✅ 2. เพิ่ม implem
       console.error('Delete failed:', error);
       alert('เกิดข้อผิดพลาดในการลบ');
     }
-  }
-
-  onEdit(mission: Mission) {
-    const ref = this._dialog.open(NewMission, {
-      data: mission 
-    });
-
-    ref.afterClosed().subscribe(async (result: AddMission) => {
-      if (!result) return; 
-
-      try {
-        await this._missionService.update(mission.id, result);
-        alert('✏️ แก้ไขข้อมูลสำเร็จ');
-        await this.loadMyMission(); 
-      } catch (error) {
-        console.error('Update failed:', error);
-        alert('แก้ไขไม่สำเร็จ');
-      }
-    });
   }
 
   async onLeave(mission: Mission) {
@@ -98,8 +101,6 @@ export class MissionManager implements OnInit { // ✅ 2. เพิ่ม implem
 
   private async loadMyMission() {
     try {
-      console.log('🔄 กำลังโหลด My Missions...');
-      
       const response: any = await this._missionService.gets({}); 
       let allMissions: any[] = [];
       
@@ -117,13 +118,7 @@ export class MissionManager implements OnInit { // ✅ 2. เพิ่ม implem
         return m.chief_id != myId && joinedIds.includes(m.id);
       });
 
-      console.log(`✅ Loaded: Leading=${this.leadingMissions.length}, Joined=${this.joinedMissions.length}`);
-      
       this.calculateStats();
-
-      // -------------------------------------------------------------
-      // ✅ 5. สั่ง Angular ให้อัปเดตหน้าจอทันที! (แก้ปัญหาข้อมูลไม่ขึ้น)
-      // -------------------------------------------------------------
       this.cdr.detectChanges();
 
     } catch (error) {
@@ -141,7 +136,9 @@ export class MissionManager implements OnInit { // ✅ 2. เพิ่ม implem
   }
 
   openDialog() {
-    const ref = this._dialog.open(NewMission);
+    const ref = this._dialog.open(NewMission, {
+      width: '500px'
+    });
     
     ref.afterClosed().subscribe(async (addMission: AddMission) => {
       if (!addMission) return;

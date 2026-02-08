@@ -9,25 +9,25 @@ import { Mission } from '../_models/mission';
   selector: 'app-missions',
   standalone: true,
   imports: [
-    FormsModule,  
-    CommonModule  
+    FormsModule,
+    CommonModule
   ],
   templateUrl: './missions.html',
   styleUrl: './missions.css',
 })
 export class Missions implements OnInit {
   private _missionService = inject(MissionService);
-  
+
   filter: MissionFilter = {
-    status: 'Open' 
+    status: undefined
   };
-  
+
   missions: Mission[] = [];
 
-  constructor() {}
-  
+  constructor() { }
+
   ngOnInit() {
-    this.onSubmit(); 
+    this.onSubmit();
   }
 
   get myUserId(): number {
@@ -53,13 +53,19 @@ export class Missions implements OnInit {
   }
 
   async joinMission(id: number) {
+    const mission = this.missions.find(m => m.id === id);
+    if (mission && mission.status !== 'Open') {
+      alert('ไม่สามารถเข้าร่วมภารกิจที่เริ่มไปแล้วหรือจบไปแล้วได้');
+      return;
+    }
+
     if (!confirm('คุณต้องการเข้าร่วมภารกิจนี้ใช่หรือไม่?')) return;
 
     try {
       await this._missionService.join(id);
       this.handleJoinSuccess(id);
     } catch (error: any) {
-      if (error.status === 404 || error.status === 200) { 
+      if (error.status === 404 || error.status === 200) {
         this.handleJoinSuccess(id);
       } else {
         alert('เกิดข้อผิดพลาดในการเข้าร่วม');
@@ -70,7 +76,7 @@ export class Missions implements OnInit {
   private handleJoinSuccess(id: number) {
     this.saveJoinedToLocal(id);
     alert('✅ Join Success! เข้าร่วมภารกิจสำเร็จ');
-    this.onSubmit(); 
+    this.onSubmit();
   }
 
   private saveJoinedToLocal(id: number) {
@@ -79,6 +85,27 @@ export class Missions implements OnInit {
     if (!current.includes(id)) {
       current.push(id);
       localStorage.setItem(key, JSON.stringify(current));
+    }
+  }
+
+  getStatusLabel(status: string): string {
+    switch (status) {
+      case 'Open': return 'เปิดรับสมัคร';
+      case 'InProgress': return 'กำลังดำเนินการ'; 
+      case 'Completed': return 'ภารกิจสำเร็จ';
+      case 'Failed': return 'ภารกิจล้มเหลว';
+      case 'Closed': return 'ปิดรับสมัคร';
+      default: return status;
+    }
+  }
+
+  getStatusClass(status: string): string {
+    switch (status) {
+      case 'Open': return 'badge-open';
+      case 'InProgress': return 'badge-warning';
+      case 'Completed': return 'badge-success';
+      case 'Failed': return 'badge-danger'; 
+      default: return 'badge-secondary';
     }
   }
 }

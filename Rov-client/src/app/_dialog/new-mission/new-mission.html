@@ -1,22 +1,39 @@
-<h2 mat-dialog-title>New Mission</h2>
+<h2 mat-dialog-title>
+  {{ missionData.id ? 'Edit Mission (แก้ไข)' : 'New Mission (สร้างใหม่)' }}
+</h2>
 
 <mat-dialog-content>
-  <div class="form-container">
+  <div class="form-container" style="display: flex; flex-direction: column; gap: 15px; min-width: 400px;">
     
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Mission Name (ชื่อภารกิจ)</mat-label> 
-      <input matInput placeholder="Ex. Kill the Dragon" [(ngModel)]="addMission.name">
+      <mat-label>Mission Name</mat-label> 
+      <input matInput placeholder="Ex. Kill the Dragon" [(ngModel)]="missionData.name">
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Description (รายละเอียด)</mat-label>
-      <textarea matInput rows="4" placeholder="Enter details..." [(ngModel)]="addMission.description"></textarea>
+      <mat-label>Description</mat-label>
+      <textarea matInput rows="4" [(ngModel)]="missionData.description"></textarea>
     </mat-form-field>
 
+    <div *ngIf="missionData.id">
+  <label class="fw-bold mb-1 d-block">Status (สถานะ)</label>
+  
+  <select [(ngModel)]="missionData.status" 
+          class="form-control"
+          style="padding: 10px; width: 100%;">
+    
+    <option value="Open">🔵 Open</option>
+    <option value="InProgress">🟡 In Progress</option>  
+    <option value="Completed">🟢 Completed</option>
+    <option value="Failed">🔴 Failed</option>
+  </select>
+</div>
   </div>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close>Cancel</button>
-  <button mat-flat-button color="primary" (click)="onSubmit()">Create</button>
+  <button mat-flat-button color="primary" (click)="onSubmit()">
+    {{ missionData.id ? 'Save Changes' : 'Create' }}
+  </button>
 </mat-dialog-actions>

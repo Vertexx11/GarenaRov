@@ -49,5 +49,6 @@ pub struct AddMissionEntity {
 pub struct EditMissionEntity {
     pub chief_id: i32,
     pub name: Option<String>,
+    pub status: Option<String>,
     pub description: Option<String>,
 }

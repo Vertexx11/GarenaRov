@@ -37,7 +37,6 @@ impl MissionManagementRepository for MissionManagementPostgres {
         let result = update(missions::table)
             .filter(missions::id.eq(mission_id))
             .filter(missions::deleted_at.is_null())
-            .filter(missions::status.eq(MissionStatuses::Open.to_string()))
             .set(edit_mission_entity)
             .returning(missions::id)
             .get_result::<i32>(&mut conn)?;
@@ -50,7 +49,6 @@ impl MissionManagementRepository for MissionManagementPostgres {
         update(missions::table)
             .filter(missions::id.eq(mission_id))
             .filter(missions::deleted_at.is_null())
-            .filter(missions::status.eq(MissionStatuses::Open.to_string()))
             .set((
                 missions::deleted_at.eq(now),
                 missions::chief_id.eq(chief_id),

@@ -51,11 +51,17 @@
             <tr>
               <td class="fw-bold">{{ mission.name }}</td>
               <td class="text-desc">{{ mission.description }}</td>
+              
               <td>
                 <span class="status-badge" [ngClass]="{
                   'open': mission.status === 'Open',
-                  'completed': mission.status === 'Completed'
-                }">{{ mission.status }}</span>
+                  'inprogress': mission.status === 'InProgress',
+                  'completed': mission.status === 'Completed',
+                  'failed': mission.status === 'Failed',
+                  'closed': mission.status === 'Closed'
+                }">
+                  {{ mission.status }}
+                </span>
               </td>
               <td>{{ mission.crew_count }} / 3</td>
               <td>
@@ -97,11 +103,17 @@
               <td class="fw-bold">{{ mission.name }}</td>
               <td class="text-desc">{{ mission.description }}</td>
               <td>👮 {{ mission.chief_id }}</td>
+              
               <td>
                 <span class="status-badge" [ngClass]="{
                   'open': mission.status === 'Open',
-                  'completed': mission.status === 'Completed'
-                }">{{ mission.status }}</span>
+                  'inprogress': mission.status === 'InProgress',
+                  'completed': mission.status === 'Completed',
+                  'failed': mission.status === 'Failed',
+                  'closed': mission.status === 'Closed'
+                }">
+                  {{ mission.status }}
+                </span>
               </td>
               <td class="text-muted">{{ mission.created_at | date:'MM/dd/yy' }}</td>
               <td>

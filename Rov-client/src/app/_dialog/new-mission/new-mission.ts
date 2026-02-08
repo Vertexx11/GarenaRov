@@ -1,33 +1,61 @@
-import { Component, inject } from '@angular/core';
-import { AddMission } from '../../_models/add-mission';
-import { MatDialogModule, MatDialogRef, } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
+import { Component, Inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatInputModule } from '@angular/material/input';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-new-mission',
-  imports: [FormsModule,MatDialogModule, MatButtonModule,MatInputModule, MatFormFieldModule],
+  standalone: true,
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    MatDialogModule, 
+    MatButtonModule, 
+    MatFormFieldModule, 
+    MatInputModule
+  ],
   templateUrl: './new-mission.html',
-  styleUrl: './new-mission.css',
+  styleUrl: './new-mission.css'
 })
+
 export class NewMission {
-  addMission: AddMission = {
-    name: '',
-    description: ''
+  missionData: any;
+
+  constructor(
+    public dialogRef: MatDialogRef<NewMission>,
+    @Inject(MAT_DIALOG_DATA) public data: any 
+  ) {
+    console.log('ข้อมูลที่ได้รับ:', data); 
+
+    if (data) {
+      this.missionData = { ...data };
+
+    } else {
+      this.missionData = { 
+        name: '', 
+        description: '', 
+        status: 'Open' 
+      };
+    }
   }
-  private readonly _dialogRef = inject(MatDialogRef<NewMission>);
 
   onSubmit() {
-    const mission = this.clean(this.addMission);
-    this._dialogRef.close(mission); 
+    const payload = this.clean(this.missionData);
+    console.log('📦 กำลังจะส่งข้อมูลไปหา Backend:', payload);
+    
+    this.dialogRef.close(payload);
   }
 
-  private clean(addMission: AddMission): AddMission {
-    return {
-      name: addMission.name.trim() || 'untitle',
-      description: addMission.description?.trim() || undefined
+  private clean(data: any): any {
+    const cleanData: any = {
+      name: data.name?.trim() || 'Untitled',
+      description: data.description?.trim() || undefined,
+      status: data.status 
     };
+    
+    return cleanData;
   }
 }

@@ -42,7 +42,9 @@ export class MissionService {
 
   async update(id: number, data: AddMission): Promise<any> {
     const url = `${this._api_url}/mission-management/${id}`;
-    return await firstValueFrom(this._http.put(url, data));
+    return await firstValueFrom(
+      this._http.patch(url, data, { responseType: 'text' })
+    ); 
   }
 
   async delete(id: number): Promise<any> {

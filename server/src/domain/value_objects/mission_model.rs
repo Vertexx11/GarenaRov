@@ -39,6 +39,7 @@ impl AddMissionModel {
 pub struct EditMissionModel {
     pub name: Option<String>,
     pub description: Option<String>,
+    pub status: Option<String>,
 }
 
 impl EditMissionModel {
@@ -47,6 +48,7 @@ impl EditMissionModel {
             name: self.name.clone(),
             description: self.description.clone(),
             chief_id,
+            status: self.status.clone(),
         }
     }
 }
