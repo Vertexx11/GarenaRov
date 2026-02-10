@@ -5,16 +5,17 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { max } from 'rxjs';
 
 @Component({
   selector: 'app-new-mission',
   standalone: true,
   imports: [
-    CommonModule, 
-    FormsModule, 
-    MatDialogModule, 
-    MatButtonModule, 
-    MatFormFieldModule, 
+    CommonModule,
+    FormsModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatFormFieldModule,
     MatInputModule
   ],
   templateUrl: './new-mission.html',
@@ -26,18 +27,19 @@ export class NewMission {
 
   constructor(
     public dialogRef: MatDialogRef<NewMission>,
-    @Inject(MAT_DIALOG_DATA) public data: any 
+    @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-    console.log('ข้อมูลที่ได้รับ:', data); 
+    console.log('ข้อมูลที่ได้รับ:', data);
 
     if (data) {
       this.missionData = { ...data };
 
     } else {
-      this.missionData = { 
-        name: '', 
-        description: '', 
-        status: 'Open' 
+      this.missionData = {
+        name: '',
+        description: '',
+        status: 'Open',
+        max_crew: 3
       };
     }
   }
@@ -45,7 +47,7 @@ export class NewMission {
   onSubmit() {
     const payload = this.clean(this.missionData);
     console.log('📦 กำลังจะส่งข้อมูลไปหา Backend:', payload);
-    
+
     this.dialogRef.close(payload);
   }
 
@@ -53,9 +55,10 @@ export class NewMission {
     const cleanData: any = {
       name: data.name?.trim() || 'Untitled',
       description: data.description?.trim() || undefined,
-      status: data.status 
+      status: data.status,
+      max_crew: data.max_crew || 1
     };
-    
+
     return cleanData;
   }
 }

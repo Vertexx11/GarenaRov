@@ -29,6 +29,9 @@ export class ErrorService {
           break;
 
         case 404:
+          if (error.url && error.url.includes('join')) {
+            break;
+          }
           this._router.navigate(['/not-found']);
           break;
 

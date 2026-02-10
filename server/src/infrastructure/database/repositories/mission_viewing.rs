@@ -15,6 +15,7 @@ use crate::{
         schema::{crew_memberships, missions},
     },
 };
+
 pub struct MissionViewingPostgres {
     db_pool: Arc<PgPoolSquad>,
 }
@@ -57,6 +58,11 @@ impl MissionViewingRepository for MissionViewingPostgres {
             .filter(missions::deleted_at.is_null())
             .into_boxed();
 
+        // 👇 เพิ่มตรงนี้ครับ! (สำคัญสำหรับหน้า My Missions)
+        if let Some(chief_id) = mission_filter.chief_id {
+            query = query.filter(missions::chief_id.eq(chief_id));
+        }
+
         if let Some(status) = &mission_filter.status {
             let status_string = status.to_string();
             query = query.filter(missions::status.eq(status_string));
@@ -72,14 +78,16 @@ impl MissionViewingRepository for MissionViewingPostgres {
 
         Ok(value)
     }
+
     async fn get_mission_count(&self, mission_id: i32) -> Result<Vec<BrawlerModel>> {
         let mut conn = Arc::clone(&self.db_pool).get()?;
 
         let sql = r#"
             SELECT 
-               COALESCE(b.avatar_url, '') AS avatar_url
-               COALESCE(s.success_count, 0) AS success_count,
-               COALESCE(j.joined_count, 0) AS joined_count,
+                b.display_name,
+                COALESCE(b.avatar_url, '') AS avatar_url,
+                COALESCE(s.success_count, 0) AS mission_success_count, 
+                COALESCE(j.joined_count, 0) AS mission_joined_count
             FROM 
                 crew_memberships cm
             INNER JOIN 

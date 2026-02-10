@@ -15,19 +15,21 @@
       <textarea matInput rows="4" [(ngModel)]="missionData.description"></textarea>
     </mat-form-field>
 
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Max Crew (จำนวนคนสูงสุด)</mat-label>
+      <input matInput type="number" min="1" placeholder="Ex. 3" [(ngModel)]="missionData.max_crew">
+    </mat-form-field>
     <div *ngIf="missionData.id">
-  <label class="fw-bold mb-1 d-block">Status (สถานะ)</label>
-  
-  <select [(ngModel)]="missionData.status" 
-          class="form-control"
-          style="padding: 10px; width: 100%;">
-    
-    <option value="Open">🔵 Open</option>
-    <option value="InProgress">🟡 In Progress</option>  
-    <option value="Completed">🟢 Completed</option>
-    <option value="Failed">🔴 Failed</option>
-  </select>
-</div>
+      <label class="fw-bold mb-1 d-block">Status (สถานะ)</label>
+      <select [(ngModel)]="missionData.status" 
+              class="form-control"
+              style="padding: 10px; width: 100%;">
+        <option value="Open">🔵 Open</option>
+        <option value="InProgress">🟡 In Progress</option>  
+        <option value="Completed">🟢 Completed</option>
+        <option value="Failed">🔴 Failed</option>
+      </select>
+    </div>
   </div>
 </mat-dialog-content>
 

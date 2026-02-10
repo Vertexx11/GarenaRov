@@ -5,6 +5,7 @@ export interface Mission {
   status: string;
   chief_id: number;
   crew_count: number;
+  max_crew: number;
   created_at: Date;
   updated_at: Date;
 }

@@ -14,7 +14,7 @@ export class MissionService {
   private _http = inject(HttpClient);
 
   async getMyMissions(): Promise<Mission[]> {
-    const url = this._api_url + '/brawlers/my-missions';
+    const url = this._api_url + '/view/my-missions';
     const observable = this._http.get<Mission[]>(url);
     const missions = await firstValueFrom(observable);
     return missions;
@@ -51,8 +51,6 @@ export class MissionService {
     const url = `${this._api_url}/mission-management/${id}`;
     return await firstValueFrom(this._http.delete(url, { responseType: 'text' }));
   }
-
-
 
   private toQueryString(filter: MissionFilter): string {
     const params: string[] = [];

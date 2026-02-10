@@ -16,12 +16,14 @@ pub struct MissionModel {
     pub crew_count: i64,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+    pub max_crew: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct AddMissionModel {
     pub name: String,
     pub description: Option<String>,
+    max_crew: i32,
 }
 
 impl AddMissionModel {
@@ -31,6 +33,7 @@ impl AddMissionModel {
             description: self.description.clone(),
             status: MissionStatuses::Open.to_string(),
             chief_id,
+            max_crew: self.max_crew,
         }
     }
 }
@@ -40,6 +43,7 @@ pub struct EditMissionModel {
     pub name: Option<String>,
     pub description: Option<String>,
     pub status: Option<String>,
+    pub max_crew: Option<i32>,
 }
 
 impl EditMissionModel {
@@ -49,6 +53,7 @@ impl EditMissionModel {
             description: self.description.clone(),
             chief_id,
             status: self.status.clone(),
+            max_crew: self.max_crew,
         }
     }
 }

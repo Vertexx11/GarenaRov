@@ -63,7 +63,7 @@
                   {{ mission.status }}
                 </span>
               </td>
-              <td>{{ mission.crew_count }} / 3</td>
+              <td>{{ mission.crew_count }} / {{ mission.max_crew || 3 }}</td>
               <td>
                 <div class="actions">
                   <button class="icon-btn edit" (click)="onEdit(mission)">✏️</button>
