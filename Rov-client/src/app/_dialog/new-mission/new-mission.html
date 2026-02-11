@@ -3,7 +3,7 @@
 </h2>
 
 <mat-dialog-content>
-  <div class="form-container" style="display: flex; flex-direction: column; gap: 15px; min-width: 400px;">
+  <div class="form-container" style="display: flex; flex-direction: column; gap: 15px; min-width: 400px; padding-top: 5px;">
     
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Mission Name</mat-label> 
@@ -15,21 +15,39 @@
       <textarea matInput rows="4" [(ngModel)]="missionData.description"></textarea>
     </mat-form-field>
 
+    <div style="display: flex; gap: 15px;">
+      <mat-form-field appearance="outline" style="flex: 1;">
+        <mat-label>Difficulty (ระดับความยาก)</mat-label>
+        <mat-select [(ngModel)]="missionData.difficulty">
+          <mat-option value="EASY">🟢 EASY (ง่าย)</mat-option>
+          <mat-option value="NORMAL">🔵 NORMAL (ปานกลาง)</mat-option>
+          <mat-option value="HARD">🔴 HARD (ยาก)</mat-option>
+          <mat-option value="EXTREME">🟣 EXTREME (โหดจัด)</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" style="flex: 1;">
+        <mat-label>Base Points (แต้มรางวัล)</mat-label>
+        <input matInput type="number" min="1" placeholder="Ex. 5" [(ngModel)]="missionData.base_points">
+      </mat-form-field>
+    </div>
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Max Crew (จำนวนคนสูงสุด)</mat-label>
       <input matInput type="number" min="1" placeholder="Ex. 3" [(ngModel)]="missionData.max_crew">
     </mat-form-field>
+
     <div *ngIf="missionData.id">
       <label class="fw-bold mb-1 d-block">Status (สถานะ)</label>
       <select [(ngModel)]="missionData.status" 
               class="form-control"
-              style="padding: 10px; width: 100%;">
+              style="padding: 10px; width: 100%; border: 1px solid #ccc; border-radius: 4px;">
         <option value="Open">🔵 Open</option>
         <option value="InProgress">🟡 In Progress</option>  
         <option value="Completed">🟢 Completed</option>
         <option value="Failed">🔴 Failed</option>
       </select>
     </div>
+
   </div>
 </mat-dialog-content>
 

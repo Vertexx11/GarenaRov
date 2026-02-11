@@ -1,4 +1,3 @@
-/* Layout หลัก */
 .dashboard-container {
   padding: 40px;
   background-color: #F9FAFB;
@@ -6,7 +5,6 @@
   font-family: sans-serif;
 }
 
-/* Header */
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -21,7 +19,6 @@
   margin: 0;
 }
 
-/* --- ส่วน Stats Cards --- */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -51,7 +48,6 @@
   color: #111827;
 }
 
-/* --- หัวข้อ Section --- */
 .section-container { margin-bottom: 40px; }
 .section-title { display: flex; align-items: center; margin-bottom: 20px; }
 .section-title .bar { width: 4px; height: 28px; margin-right: 12px; border-radius: 4px; }
@@ -59,7 +55,6 @@
 .section-title .bar.blue { background-color: #3B82F6; }
 .section-title h3 { font-size: 1.5rem; color: #374151; font-weight: 600; margin: 0; }
 
-/* --- ตาราง --- */
 .table-card {
   background: white;
   border-radius: 12px;
@@ -78,22 +73,37 @@
 }
 .styled-table tr:last-child td { border-bottom: none; }
 
-/* Styling ในตาราง */
 .fw-bold { font-weight: 600; }
 .text-desc { color: #6B7280; font-style: italic; }
 .text-muted { color: #9CA3AF; font-size: 0.9rem; }
 .empty-text { text-align: center; color: #9CA3AF; padding: 40px; font-style: italic; }
 
-/* Status Badges */
 .status-badge {
   padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
 }
 .status-badge.open { background: #ECFDF5; color: #047857; }
 .status-badge.completed { background: #EFF6FF; color: #1D4ED8; }
 
-/* Buttons */
 .actions { display: flex; gap: 8px; }
 .icon-btn { background: none; border: none; cursor: pointer; font-size: 1.1rem; opacity: 0.6; }
 .icon-btn:hover { opacity: 1; transform: scale(1.1); }
 .btn-leave { color: #EF4444; border: 1px solid #FECACA; background: #FEF2F2; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; }
 .btn-leave:hover { background: #FEE2E2; }
+
+.bar.gold { background: linear-gradient(to bottom, #fde047, #ca8a04); }
+
+.top-rank { background-color: rgba(254, 252, 232, 0.5); }
+.rank-cell { font-size: 1.2rem; font-weight: bold; width: 80px; text-align: center; }
+
+.brawler-profile { display: flex; align-items: center; gap: 10px; }
+.avatar-mini { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #ddd; object-fit: cover; }
+
+.points-tag {
+  background: #4f46e5; color: white; padding: 4px 12px;
+  border-radius: 15px; font-size: 0.85rem; font-weight: bold;
+}
+
+.level-badge { padding: 2px 10px; border-radius: 4px; font-size: 0.75rem; text-transform: uppercase; font-weight: bold; }
+.level-badge.pro { background: #fee2e2; color: #dc2626; border: 1px solid #dc2626; }
+.level-badge.veteran { background: #dcfce7; color: #16a34a; border: 1px solid #16a34a; } 
+.level-badge.rookie { background: #f3f4f6; color: #4b5563; } 

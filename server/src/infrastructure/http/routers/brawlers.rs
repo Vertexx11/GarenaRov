@@ -27,7 +27,17 @@ pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
     Router::new()
         .merge(protected_router)
         .route("/register", post(register))
+        .route("/leaderboard", get(get_leaderboard)) 
         .with_state(Arc::new(brawlers_use_case)) 
+}
+
+pub async fn get_leaderboard(
+    State(brawlers_use_case): State<Arc<BrawlersUseCase<BrawlerPostgres>>>,
+) -> impl IntoResponse {
+    match brawlers_use_case.get_leaderboard().await {
+        Ok(leaderboard) => (StatusCode::OK, Json(leaderboard)).into_response(),
+        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    }
 }
 
 

@@ -1,17 +1,35 @@
+.my-navbar {
+  font-family: 'Inter', sans-serif; 
+}
+
 .spacer {
   flex: 1 1 auto; 
 }
 
+.mat-mdc-button {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  margin: 0 4px;
+  border-radius: 50px !important; 
+  transition: all 0.2s ease-in-out !important;
+}
+
+.active, .mat-mdc-button:hover {
+  background-color: #eff6ff !important; 
+  color: #2563eb !important;          
+}
+
+mat-icon {
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
 .avatar {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   margin-right: 8px;
   vertical-align: middle;
-  border: 1px solid rgba(255,255,255,0.5);
+  border: 2px solid rgba(255,255,255,0.8);
   object-fit: cover; 
-}
-
-.active {
-  background: rgba(255, 255, 255, 0.1); 
 }

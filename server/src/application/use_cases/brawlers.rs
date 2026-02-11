@@ -1,5 +1,6 @@
 use crate::{
     domain::{
+        entities::brawlers::Brawler, 
         repositories::brawlers::BrawlerRepository,
         value_objects::{
             base64_image::Base64Image, brawler_model::RegisterBrawlerModel,
@@ -30,19 +31,20 @@ where
         Self { brawler_repository }
     }
 
+    // 🌟 ย้ายเข้ามาในบล็อก impl และเรียกใช้ repository แทนการคิวรีฐานข้อมูลเอง
+    pub async fn get_leaderboard(&self) -> Result<Vec<Brawler>, String> {
+        self.brawler_repository.get_leaderboard().await
+    }
+
     pub async fn register(&self, mut register_model: RegisterBrawlerModel) -> Result<Passport> {
         let hashed_password = hash(register_model.password.clone())?;
 
         register_model.password = hashed_password;
 
-        // เก็บ display_name ไว้ก่อน
         let display_name_for_token = register_model.display_name.clone();
-
         let register_entity = register_model.to_entity();
-
         let brawler_id = self.brawler_repository.register(register_entity).await?;
 
-        // ส่ง id และ display_name ไปสร้าง Token
         let passport = Passport::new(brawler_id, display_name_for_token);
         Ok(passport)
     }

@@ -12,20 +12,22 @@
       <div class="stat-label">TOTAL MISSIONS</div>
       <div class="stat-value">{{ stats.total }}</div>
     </div>
-    
     <div class="stat-card" style="border-top-color: #8B5CF6;">
       <div class="stat-label">LEADING</div>
       <div class="stat-value">{{ stats.leading }}</div>
     </div>
-
     <div class="stat-card" style="border-top-color: #14B8A6;">
       <div class="stat-label">JOINED</div>
       <div class="stat-value">{{ stats.joined }}</div>
     </div>
-
     <div class="stat-card" style="border-top-color: #FBBF24;">
       <div class="stat-label">OPEN JOBS</div>
       <div class="stat-value">{{ stats.open }}</div>
+    </div>
+
+    <div class="stat-card" style="border-top-color: #F59E0B; background-color: #FFFBEB;">
+      <div class="stat-label" style="color: #B45309;">🏆 MY TOTAL POINTS</div>
+      <div class="stat-value" style="color: #92400E;">{{ stats.points | number }}</div>
     </div>
   </div>
 
@@ -41,6 +43,8 @@
           <tr>
             <th>NAME</th>
             <th>DESCRIPTION</th>
+            <th>DIFFICULTY</th> 
+            <th>POINTS</th>    
             <th>STATUS</th>
             <th>CREW</th>
             <th>ACTIONS</th>
@@ -51,7 +55,16 @@
             <tr>
               <td class="fw-bold">{{ mission.name }}</td>
               <td class="text-desc">{{ mission.description }}</td>
-              
+              <td>
+                <span [ngStyle]="{
+                  'color': mission.difficulty === 'HARD' ? '#ef4444' : 
+                           mission.difficulty === 'NORMAL' ? '#3b82f6' : '#10b981',
+                  'font-weight': 'bold'
+                }">
+                  {{ mission.difficulty }}
+                </span>
+              </td>
+              <td class="fw-bold">{{ mission.base_points }} pts</td>
               <td>
                 <span class="status-badge" [ngClass]="{
                   'open': mission.status === 'Open',
@@ -72,7 +85,7 @@
               </td>
             </tr>
           } @empty {
-             <tr><td colspan="5" class="empty-text">คุณยังไม่ได้สร้างภารกิจใดๆ</td></tr>
+              <tr><td colspan="7" class="empty-text">คุณยังไม่ได้สร้างภารกิจใดๆ</td></tr>
           }
         </tbody>
       </table>
@@ -91,6 +104,8 @@
           <tr>
             <th>NAME</th>
             <th>DESCRIPTION</th>
+            <th>DIFFICULTY</th> 
+            <th>POINTS</th> 
             <th>CHIEF ID</th>
             <th>STATUS</th>
             <th>JOINED AT</th>
@@ -102,8 +117,13 @@
             <tr>
               <td class="fw-bold">{{ mission.name }}</td>
               <td class="text-desc">{{ mission.description }}</td>
+              <td>
+                <span class="badge" [ngStyle]="{'background-color': '#f3f4f6', 'padding': '4px 8px', 'border-radius': '4px'}">
+                  {{ mission.difficulty }}
+                </span>
+              </td>
+              <td class="fw-bold">{{ mission.base_points }} pts</td>
               <td>👮 {{ mission.chief_id }}</td>
-              
               <td>
                 <span class="status-badge" [ngClass]="{
                   'open': mission.status === 'Open',
@@ -121,7 +141,7 @@
               </td>
             </tr>
           } @empty {
-            <tr><td colspan="6" class="empty-text">คุณยังไม่ได้เข้าร่วมภารกิจใดๆ</td></tr>
+            <tr><td colspan="8" class="empty-text">คุณยังไม่ได้เข้าร่วมภารกิจใดๆ</td></tr>
          }
         </tbody>
       </table>

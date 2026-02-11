@@ -5,7 +5,7 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { max } from 'rxjs';
+import { MatSelectModule } from '@angular/material/select'; 
 
 @Component({
   selector: 'app-new-mission',
@@ -16,12 +16,12 @@ import { max } from 'rxjs';
     MatDialogModule,
     MatButtonModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MatSelectModule 
   ],
   templateUrl: './new-mission.html',
   styleUrl: './new-mission.css'
 })
-
 export class NewMission {
   missionData: any;
 
@@ -33,13 +33,14 @@ export class NewMission {
 
     if (data) {
       this.missionData = { ...data };
-
     } else {
       this.missionData = {
         name: '',
         description: '',
         status: 'Open',
-        max_crew: 3
+        max_crew: 3,
+        difficulty: 'NORMAL', 
+        base_points: 3        
       };
     }
   }
@@ -47,7 +48,6 @@ export class NewMission {
   onSubmit() {
     const payload = this.clean(this.missionData);
     console.log('📦 กำลังจะส่งข้อมูลไปหา Backend:', payload);
-
     this.dialogRef.close(payload);
   }
 
@@ -56,7 +56,9 @@ export class NewMission {
       name: data.name?.trim() || 'Untitled',
       description: data.description?.trim() || undefined,
       status: data.status,
-      max_crew: data.max_crew || 1
+      max_crew: data.max_crew || 1,
+      difficulty: data.difficulty || 'NORMAL',    
+      base_points: Number(data.base_points) || 3  
     };
 
     return cleanData;

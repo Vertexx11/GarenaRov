@@ -40,6 +40,8 @@
             <th>ID</th>
             <th>MISSION NAME</th>
             <th>DESCRIPTION</th>
+            <th>DIFFICULTY</th>
+            <th>POINTS</th>
             <th>CHIEF ID</th>
             <th>CREW</th>
             <th>STATUS</th>
@@ -53,8 +55,21 @@
               <td class="text-muted">#{{ mission.id }}</td>
               <td class="fw-bold">{{ mission.name }}</td>
               <td class="text-desc">{{ mission.description || '-' }}</td>
+              
+              <td>
+                <span [ngStyle]="{
+                  'color': mission.difficulty === 'HARD' ? '#ef4444' : 
+                           mission.difficulty === 'NORMAL' ? '#3b82f6' : '#10b981',
+                  'font-weight': 'bold'
+                }">
+                  {{ mission.difficulty || 'NORMAL' }}
+                </span>
+              </td>
+
+              <td class="fw-bold">{{ mission.base_points || 0 }} pts</td>
+
               <td><div class="chief-badge">👮 {{ mission.chief_id }}</div></td>
-              <td>{{ mission.crew_count }} / 3</td>
+              <td>{{ mission.crew_count }} / {{ mission.max_crew || 3 }}</td>
               <td>
                 <span class="status-badge" [ngClass]="{'open': mission.status === 'Open'}">
                   {{ mission.status }}
@@ -62,7 +77,7 @@
               </td>
               <td class="text-date">{{ mission.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
               <td>
-                @if (mission.crew_count >= 3) {
+                @if (mission.crew_count >= (mission.max_crew || 3)) {
                    <button class="btn-join disabled" disabled>Full</button>
                 } @else {
                    <button class="btn-join" (click)="joinMission(mission.id)">Join</button>
@@ -70,7 +85,7 @@
               </td>
             </tr>
           } @empty {
-            <tr><td colspan="8" class="no-data">ไม่พบข้อมูลภารกิจ</td></tr>
+            <tr><td colspan="10" class="no-data">ไม่พบข้อมูลภารกิจ</td></tr>
           }
         </tbody>
       </table>

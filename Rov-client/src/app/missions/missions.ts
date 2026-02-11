@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { MissionService } from '../_services/mission-service';
 import { MissionFilter } from '../_models/mission-filter';
 import { Mission } from '../_models/mission';
+import { Brawler } from '../_models/brawler'; 
 
 @Component({
   selector: 'app-missions',
@@ -23,13 +24,24 @@ export class Missions implements OnInit {
   };
 
   missions: Mission[] = [];
+  topBrawlers: Brawler[] = []; 
 
   constructor() { }
 
   ngOnInit() {
     this.onSubmit();
+    this.loadLeaderboard(); 
+  }
+  async loadLeaderboard() {
+    try {
+      const data = await this._missionService.getLeaderboard();
+      this.topBrawlers = data.sort((a: Brawler, b: Brawler) => b.total_points - a.total_points);
+    } catch (error) {
+      console.error('Leaderboard error:', error);
+    }
   }
 
+  // --- โค้ดเดิมของคุณ (ห้ามลบ) ---
   get myUserId(): number {
     const userStr = localStorage.getItem('user');
     return userStr ? JSON.parse(userStr).id : 26;

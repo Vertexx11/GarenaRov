@@ -1,5 +1,7 @@
 import { Injectable, ApplicationRef, EnvironmentInjector, createComponent, ComponentRef, inject } from '@angular/core';
 import { Loading } from '../_shared/loading/loading';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
@@ -7,12 +9,13 @@ import { Loading } from '../_shared/loading/loading';
 export class LoadingService {
   loadingRequestCount = 0;
 
+  private http = inject(HttpClient); 
+  private apiUrl = environment.baseUrl + 'api/v1';
   private loadingComponentRef: ComponentRef<Loading> | null = null;
   private appRef = inject(ApplicationRef);
   private injector = inject(EnvironmentInjector);
 
   loading(): void {
-    // ✅ เพิ่มบรรทัดนี้: ป้องกัน Error document is not defined
     if (typeof document === 'undefined') return;
 
     this.loadingRequestCount++;
@@ -31,7 +34,6 @@ export class LoadingService {
   }
 
   idle(): void {
-    // ✅ เพิ่มบรรทัดนี้ด้วย
     if (typeof document === 'undefined') return;
 
     this.loadingRequestCount--;
@@ -45,4 +47,5 @@ export class LoadingService {
     this.loadingComponentRef.destroy();
     this.loadingComponentRef = null;
   }
+
 }

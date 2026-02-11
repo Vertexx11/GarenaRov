@@ -16,9 +16,14 @@
     </button>
   }
 
+  <button mat-button routerLink="/leaderboard" routerLinkActive="active">
+    <mat-icon>emoji_events</mat-icon>
+    <span>Leaderboard</span>
+  </button>
+
   <span class="spacer"></span>
 
-  @if (display_name() === undefined) {
+  @if (!display_name()) {
     <button mat-button routerLink="/login" routerLinkActive="active">
       <mat-icon>login</mat-icon>
       <span>Login</span>
@@ -44,5 +49,4 @@
       </button>
     </mat-menu>
   }
-
 </mat-toolbar>

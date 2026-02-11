@@ -7,6 +7,7 @@ import { Login } from './login/login';
 import { Missions } from './missions/missions';
 import { MissionManager } from './missions/mission-manager/mission-manager'; 
 import { authGuard } from './_guard/auth-guard';
+import { LeaderboardComponent } from './leaderboard/leaderboard';
 
 export const routes: Routes = [
     { path: '', component: Home },
@@ -21,14 +22,14 @@ export const routes: Routes = [
     { 
         path: 'missions', 
         component: Missions,
-        runGuardsAndResolvers: 'always',
-        canActivate: []
+        runGuardsAndResolvers: 'always'
     },
     { 
         path: 'profile', 
         component: Profile,
-        runGuardsAndResolvers: 'always',
-        canActivate: []
+        runGuardsAndResolvers: 'always'
     },
+    { path: 'my-missions', component: MissionManager },
+    { path: 'leaderboard', component: LeaderboardComponent },
     { path: '**', component: NotFound }, 
 ];

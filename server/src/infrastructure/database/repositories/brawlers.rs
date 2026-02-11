@@ -1,17 +1,24 @@
 use anyhow::Result;
 use async_trait::async_trait;
 use diesel::{
-    ExpressionMethods, RunQueryDsl, SelectableHelper, insert_into,
-    query_dsl::methods::{FilterDsl, SelectDsl},
+    prelude::*,
+    insert_into,
 };
 use std::sync::Arc;
 
 use crate::{
     domain::{
-        entities::brawlers::{BrawlerEntity, RegisterBrawlerEntity},
-        repositories::brawlers::BrawlerRepository, value_objects::{base64_image::Base64Image, uploaded_image::UploadedImage},
+        entities::{
+            brawlers::{Brawler, BrawlerEntity, RegisterBrawlerEntity}, 
+            missions::MissionEntity
+        },
+        repositories::brawlers::BrawlerRepository, 
+        value_objects::{base64_image::Base64Image, uploaded_image::UploadedImage},
     },
-    infrastructure::{cloudinary::UploadImageOptions, database::{postgresql_connection::PgPoolSquad, schema::brawlers}},
+    infrastructure::{
+        cloudinary::UploadImageOptions, 
+        database::{postgresql_connection::PgPoolSquad, schema::brawlers}
+    },
 };
 
 pub struct BrawlerPostgres {
@@ -47,6 +54,7 @@ impl BrawlerRepository for BrawlerPostgres {
 
         Ok(result)
     }
+    
     async fn upload_avatar(
         &self,
         brawler_id: i32,
@@ -69,11 +77,24 @@ impl BrawlerRepository for BrawlerPostgres {
         Ok(uploaded_image)
     }
 
-    async fn crew_counting(&self, mission_id: i32) -> Result<i32> {
+    async fn get_leaderboard(&self) -> std::result::Result<Vec<Brawler>, String> {
+        use crate::infrastructure::database::schema::brawlers::dsl::*;
+        
+        let mut connection = Arc::clone(&self.db_pool).get().map_err(|e| e.to_string())?;
+
+        brawlers
+            .order(total_points.desc()) 
+            .limit(10)                  
+            .load::<BrawlerEntity>(&mut connection)
+            .map(|entities| entities.into_iter().map(|e| e.into()).collect())
+            .map_err(|e| e.to_string())
+    }
+
+    async fn crew_counting(&self, _mission_id: i32) -> Result<i32> {
         todo!()
     }
 
-    async fn get_missions(&self, brawler_id: i32) -> Result<Vec<crate::domain::entities::missions::MissionEntity>> {
+    async fn get_missions(&self, _brawler_id: i32) -> Result<Vec<MissionEntity>> {
         todo!()
     }
 }

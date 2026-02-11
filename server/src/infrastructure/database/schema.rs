@@ -15,6 +15,7 @@ diesel::table! {
         avatar_url -> Nullable<Varchar>,
         #[max_length = 255]
         avatar_public_id -> Nullable<Varchar>,
+        total_points -> Int4,
     }
 }
 
@@ -39,6 +40,10 @@ diesel::table! {
         updated_at -> Timestamp,
         deleted_at -> Nullable<Timestamp>,
         max_crew -> Int4,
+        #[max_length = 20]
+        difficulty -> Varchar,
+        base_points -> Int4,
+        due_date -> Nullable<Timestamp>,
     }
 }
 

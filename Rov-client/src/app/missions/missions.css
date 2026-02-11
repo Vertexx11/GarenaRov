@@ -1,16 +1,10 @@
-/* =========================================
-   1. โครงสร้างหลัก (Layout & Background)
-   ========================================= */
 .mission-container {
   padding: 24px;
-  background-color: #F3F4F6; /* สีเทาอ่อนสบายตา */
+  background-color: #F3F4F6; 
   min-height: 100vh;
-  font-family: 'Sarabun', 'Inter', sans-serif; /* ฟอนต์ */
+  font-family: 'Sarabun', 'Inter', sans-serif; 
 }
 
-/* =========================================
-   2. การ์ดค้นหา (Search Section)
-   ========================================= */
 .search-card {
   background: white;
   border-radius: 12px;
@@ -31,16 +25,16 @@
 
 .search-form {
   display: flex;
-  align-items: flex-end; /* จัดให้ปุ่มกับช่องกรอกตรงกันด้านล่าง */
+  align-items: flex-end; 
   gap: 16px;
-  flex-wrap: wrap; /* รองรับหน้าจอมือถือ */
+  flex-wrap: wrap; 
 }
 
 .input-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  flex: 1; /* ยืดเต็มพื้นที่ */
+  flex: 1; 
   min-width: 200px;
 }
 
@@ -50,7 +44,6 @@
   color: #4B5563;
 }
 
-/* ช่องกรอกข้อมูลและ Select */
 .form-control {
   width: 100%;
   padding: 10px 12px;
@@ -63,48 +56,43 @@
 
 .form-control:focus {
   outline: none;
-  border-color: #8B5CF6; /* สีม่วงเมื่อกด */
+  border-color: #8B5CF6; 
   box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
 }
 
-/* ปุ่มค้นหา */
 .btn-search {
   padding: 10px 24px;
-  background-color: #8B5CF6; /* สีม่วงหลัก */
+  background-color: #8B5CF6;
   color: white;
   border: none;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s;
-  height: 42px; /* ความสูงให้เท่า input */
+  height: 42px; 
 }
 
 .btn-search:hover {
-  background-color: #7C3AED; /* สีม่วงเข้มขึ้นตอนชี้ */
+  background-color: #7C3AED; 
 }
 
-/* =========================================
-   3. ตารางผลลัพธ์ (Table Section)
-   ========================================= */
 .results-card {
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  overflow: hidden; /* ตัดมุมโค้ง */
+  overflow: hidden; 
 }
 
 .table-responsive {
-  overflow-x: auto; /* เลื่อนซ้ายขวาได้ถ้าจอเล็ก */
+  overflow-x: auto; 
 }
 
 .mission-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 800px; /* กันตารางบีบเกินไป */
+  min-width: 800px; 
 }
 
-/* หัวตาราง */
 .mission-table thead {
   background-color: #F9FAFB;
   border-bottom: 2px solid #E5E7EB;
@@ -120,14 +108,13 @@
   letter-spacing: 0.05em;
 }
 
-/* แถวข้อมูล */
 .mission-table tbody tr {
   border-bottom: 1px solid #E5E7EB;
   transition: background-color 0.15s;
 }
 
 .mission-table tbody tr:hover {
-  background-color: #F9FAFB; /* ไฮไลท์สีเทาอ่อนเมื่อเมาส์ชี้ */
+  background-color: #F9FAFB; 
 }
 
 .mission-table td {
@@ -137,23 +124,16 @@
   font-size: 0.95rem;
 }
 
-/* =========================================
-   4. รายละเอียดตกแต่ง (Badges & Buttons)
-   ========================================= */
-
-/* ID สีจาง */
 .text-muted {
   color: #9CA3AF;
   font-size: 0.85rem;
 }
 
-/* ชื่อภารกิจตัวหนา */
 .fw-bold {
   font-weight: 600;
   color: #111827;
 }
 
-/* คำอธิบาย (ตัดคำถ้าตารางยาว) */
 .text-desc {
   color: #6B7280;
   font-style: italic;
@@ -163,7 +143,6 @@
   text-overflow: ellipsis;
 }
 
-/* สถานะ (Status Badge) */
 .status-badge {
   display: inline-block;
   padding: 4px 12px;
@@ -176,21 +155,20 @@
 }
 
 .status-badge.open {
-  background-color: #D1FAE5; /* เขียวอ่อน */
+  background-color: #D1FAE5; 
   color: #047857;
 }
 
 .status-badge.inprogress {
-  background-color: #FEF3C7; /* เหลือง */
+  background-color: #FEF3C7; 
   color: #B45309;
 }
 
 .status-badge.closed {
-  background-color: #FEE2E2; /* แดง */
+  background-color: #FEE2E2; 
   color: #B91C1C;
 }
 
-/* Chief Badge */
 .chief-badge {
   background-color: #EFF6FF;
   color: #1D4ED8;
@@ -203,16 +181,14 @@
   gap: 4px;
 }
 
-/* วันที่ */
 .text-date {
   font-size: 0.85rem;
   color: #6B7280;
 }
 
-/* ปุ่ม Join */
 .btn-join {
   background-color: transparent;
-  color: #2563EB; /* สีน้ำเงิน Link */
+  color: #2563EB; 
   border: 1px solid #BFDBFE;
   padding: 6px 16px;
   border-radius: 6px;
@@ -228,7 +204,6 @@
   box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
 }
 
-/* กรณีไม่มีข้อมูล */
 .no-data {
   text-align: center;
   padding: 40px;

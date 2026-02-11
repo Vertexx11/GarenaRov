@@ -1,4 +1,4 @@
-use diesel::{prelude::QueryableByName, sql_types::{BigInt, Varchar}};
+use diesel::{prelude::QueryableByName, sql_types::{BigInt, Varchar, Integer}}; 
 use serde::{Deserialize, Serialize};
 
 use crate::domain::entities::brawlers::RegisterBrawlerEntity;
@@ -30,4 +30,6 @@ pub struct BrawlerModel {
     pub mission_success_count: i64,
     #[diesel(sql_type = BigInt)]
     pub mission_joined_count: i64,
+    #[diesel(sql_type = Integer)]  
+    pub total_points: i32,         
 }

@@ -1,6 +1,7 @@
 export interface Brawler {
     displayname: string,
     avatar: string,
+    total_points: number;
     mission_success_count: number,
     mission_join_count: number
 }

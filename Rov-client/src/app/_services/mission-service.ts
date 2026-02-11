@@ -1,10 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, lastValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { MissionFilter } from '../_models/mission-filter';
 import { Mission } from '../_models/mission';
 import { AddMission } from '../_models/add-mission';
+import { Brawler } from '../_models/brawler';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,10 @@ import { AddMission } from '../_models/add-mission';
 export class MissionService {
   private _api_url = environment.baseUrl + 'api/v1'; 
   private _http = inject(HttpClient);
+
+  async getLeaderboard(): Promise<Brawler[]> {
+  return lastValueFrom(this._http.get<Brawler[]>(`${this._api_url}/brawlers/leaderboard`));
+}
 
   async getMyMissions(): Promise<Mission[]> {
     const url = this._api_url + '/view/my-missions';

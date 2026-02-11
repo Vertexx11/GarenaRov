@@ -1,6 +1,6 @@
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
-use serde_json::de;
+// use serde_json::de; 
 
 use crate::{
     domain::value_objects::mission_model::MissionModel, infrastructure::database::schema::missions,
@@ -19,7 +19,11 @@ pub struct MissionEntity {
     pub updated_at: NaiveDateTime,
     pub deleted_at: Option<NaiveDateTime>,
     pub max_crew: i32,
+    pub difficulty: String,               
+    pub base_points: i32,                 
+    pub due_date: Option<NaiveDateTime>,  
 }
+
 
 impl MissionEntity {
     pub fn to_model(&self, crew_count: i64) -> MissionModel {
@@ -33,6 +37,9 @@ impl MissionEntity {
             created_at: self.created_at,
             updated_at: self.updated_at,
             max_crew: self.max_crew,
+            difficulty: self.difficulty.clone(), 
+            base_points: self.base_points,       
+            due_date: self.due_date,             
         }
     }
 }
@@ -45,6 +52,9 @@ pub struct AddMissionEntity {
     pub status: String,
     pub description: Option<String>,
     pub max_crew: i32,
+    pub difficulty: String,               
+    pub base_points: i32,               
+    pub due_date: Option<NaiveDateTime>, 
 }
 
 #[derive(Debug, Clone, AsChangeset)]
@@ -55,4 +65,7 @@ pub struct EditMissionEntity {
     pub status: Option<String>,
     pub description: Option<String>,
     pub max_crew: Option<i32>,
-}
+    pub difficulty: Option<String>,               
+    pub base_points: Option<i32>,                 
+    pub due_date: Option<NaiveDateTime>, 
+}        

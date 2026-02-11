@@ -1,0 +1,68 @@
+<div class="dashboard-container">
+  <div class="page-header">
+    <h2>Leaderboard Rankings</h2>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card" style="border-top-color: #fbbf24;">
+      <div class="stat-label">TOP BRAWLER</div>
+      <div class="stat-value">{{ topBrawlers[0]?.display_name || 'N/A' }}</div>
+    </div>
+    <div class="stat-card" style="border-top-color: #8B5CF6;">
+      <div class="stat-label">TOTAL PLAYERS</div>
+      <div class="stat-value">{{ topBrawlers.length }}</div>
+    </div>
+  </div>
+
+  <div class="section-container mt-5">
+    <div class="section-title">
+      <div class="bar gold"></div>
+      <h3>🏆 Brawler Leaderboard (Top Rankings)</h3>
+    </div>
+
+    <div class="table-card">
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>RANK</th>
+            <th>BRAWLER</th>
+            <th>TOTAL POINTS</th>
+            <th>STATUS</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (brawler of topBrawlers; track brawler.username; let i = $index) {
+            <tr [ngClass]="{'top-rank': i < 3}">
+              <td class="rank-cell">
+                @if (i === 0) { <span class="crown">🥇</span> }
+                @else if (i === 1) { <span class="crown">🥈</span> }
+                @else if (i === 2) { <span class="crown">🥉</span> }
+                @else { {{ i + 1 }} }
+              </td>
+              <td>
+                <div class="brawler-profile">
+                  <img [src]="brawler.avatar_url || 'assets/default-avatar.png'" class="avatar-mini">
+                  <span class="fw-bold">{{ brawler.display_name }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="points-tag">{{ brawler.total_points | number }} PTS</span>
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="{
+                  'completed': brawler.total_points > 100,
+                  'inprogress': brawler.total_points > 50,
+                  'open': brawler.total_points <= 50
+                }">
+                  {{ brawler.total_points > 100 ? 'Mythic' : (brawler.total_points > 50 ? 'Legend' : 'Warrior') }}
+                </span>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="4" class="empty-text">ยังไม่มีข้อมูลการจัดอันดับ</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

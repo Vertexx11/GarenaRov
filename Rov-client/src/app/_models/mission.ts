@@ -8,4 +8,6 @@ export interface Mission {
   max_crew: number;
   created_at: Date;
   updated_at: Date;
+  difficulty: string;    
+  base_points: number;
 }
