@@ -8,46 +8,47 @@ import { AddMission } from '../../_models/add-mission';
 import { NewMission } from '../../_dialog/new-mission/new-mission';
 import { Mission } from '../../_models/mission';
 import { MissionService } from '../../_services/mission-service';
+import { PassportService } from '../../_services/passport-service';
 
 @Component({
   selector: 'app-mission-manager',
   standalone: true,
-  imports: [ 
+  imports: [
     CommonModule,
     DecimalPipe,
     DatePipe,
     NgClass,
-    MatButtonModule, 
+    MatButtonModule,
     MatIconModule
-  ], 
+  ],
   templateUrl: './mission-manager.html',
   styleUrl: './mission-manager.css',
 })
 export class MissionManager implements OnInit {
   private _missionService = inject(MissionService);
   private _dialog = inject(MatDialog);
+  private _passportService = inject(PassportService);
   private cdr = inject(ChangeDetectorRef);
-  
+
   missions: Mission[] = [];
-  
+
   get myUserId(): number {
-    const userStr = localStorage.getItem('user');
-    return userStr ? JSON.parse(userStr).id : 26;
+    return this._passportService.data()?.user?.id || 0;
   }
 
   leadingMissions: Mission[] = [];
   joinedMissions: Mission[] = [];
 
   stats = {
-    total: 0, 
-    leading: 0, 
-    joined: 0, 
+    total: 0,
+    leading: 0,
+    joined: 0,
     open: 0,
     points: 0 // 🌟 เพิ่มตัวแปรเก็บแต้มสะสม
   };
 
-  constructor() {}
-  
+  constructor() { }
+
   async ngOnInit() {
     await this.loadMyMission();
     await this.fetchMyTotalPoints(); // 🌟 เรียกโหลดแต้มเมื่อเปิดหน้า
@@ -56,15 +57,13 @@ export class MissionManager implements OnInit {
   // 🌟 ฟังก์ชันดึงแต้มสะสมจาก Leaderboard
   private async fetchMyTotalPoints() {
     try {
-      const leaderboard = await this._missionService.getLeaderboard();
-      const myId = this.myUserId;
-      // ค้นหาตัวเองในรายชื่อเพื่อดึงแต้มล่าสุดมาแสดง
-      const me = leaderboard.find((b: any) => b.id === myId || b.username === 'Kinn'); 
-      this.stats.points = me ? me.total_points : 0;
+      const brawler = await this._missionService.getMe();
+      this.stats.points = brawler.total_points;
+      this.calculateStats();
+      this.cdr.detectChanges();
     } catch (error) {
-      console.error('Error fetching points:', error);
+      console.error('❌ Error fetching total points:', error);
       this.stats.points = 0;
-    } finally {
       this.cdr.detectChanges();
     }
   }
@@ -72,16 +71,16 @@ export class MissionManager implements OnInit {
   onEdit(mission: Mission) {
     const ref = this._dialog.open(NewMission, {
       width: '500px',
-      data: { ...mission } 
+      data: { ...mission }
     });
 
     ref.afterClosed().subscribe(async (result: any) => {
-      if (!result) return; 
+      if (!result) return;
 
       try {
         await this._missionService.update(mission.id, result);
         alert('✅ แก้ไขข้อมูลสำเร็จ!');
-        await this.loadMyMission(); 
+        await this.loadMyMission();
       } catch (error: any) {
         console.error('Update failed:', error);
         const errorMessage = error.error?.message || error.message || JSON.stringify(error);
@@ -108,7 +107,7 @@ export class MissionManager implements OnInit {
     try {
       const key = 'my_joined_missions';
       let current: number[] = JSON.parse(localStorage.getItem(key) || '[]');
-      current = current.filter(id => id !== mission.id); 
+      current = current.filter(id => id !== mission.id);
       localStorage.setItem(key, JSON.stringify(current));
       this.loadMyMission();
     } catch (error) {
@@ -117,11 +116,50 @@ export class MissionManager implements OnInit {
     }
   }
 
+  async onStart(mission: Mission) {
+    if (mission.status !== 'Open') return;
+    try {
+      await this._missionService.start(mission.id);
+      alert('🚀 ภารกิจเริ่มต้นแล้ว!');
+      await this.loadMyMission();
+    } catch (error: any) {
+      alert('เกิดข้อผิดพลาด: ' + (error.error || error.message));
+    }
+  }
+
+  async onComplete(mission: Mission) {
+    if (mission.status !== 'InProgress') {
+      alert('ต้องเป็นสถานะ InProgress เท่านั้นถึงจะจบภารกิจได้');
+      return;
+    }
+    if (!confirm('ยืนยันจบภารกิจและรับแต้ม?')) return;
+    try {
+      await this._missionService.complete(mission.id);
+      alert('✅ ภารกิจสำเร็จ! ได้รับแต้มรางวัล');
+      await this.loadMyMission();
+      await this.fetchMyTotalPoints(); // 🌟 รีโหลดแต้มล่าสุด
+    } catch (error: any) {
+      alert('เกิดข้อผิดพลาด: ' + (error.error || error.message));
+    }
+  }
+
+  async onFail(mission: Mission) {
+    if (mission.status !== 'InProgress') return;
+    if (!confirm('ยืนยันว่าภารกิจล้มเหลว?')) return;
+    try {
+      await this._missionService.fail(mission.id);
+      alert('❌ ภารกิจล้มเหลว');
+      await this.loadMyMission();
+    } catch (error: any) {
+      alert('เกิดข้อผิดพลาด: ' + (error.error || error.message));
+    }
+  }
+
   private async loadMyMission() {
     try {
-      const response: any = await this._missionService.gets({}); 
-      let allMissions: any[] = []; 
-      
+      const response: any = await this._missionService.gets({});
+      let allMissions: any[] = [];
+
       if (Array.isArray(response)) {
         allMissions = response;
       } else if (response?.data && Array.isArray(response.data)) {
@@ -129,7 +167,8 @@ export class MissionManager implements OnInit {
       }
 
       const myId = this.myUserId;
-      this.leadingMissions = allMissions.filter((m: any) => m.chief_id == myId);
+      // 🌟 Filter out Completed from leading (User preference for active list)
+      this.leadingMissions = allMissions.filter((m: any) => m.chief_id == myId && m.status !== 'Completed');
 
       const joinedIds = JSON.parse(localStorage.getItem('my_joined_missions') || '[]');
       this.joinedMissions = allMissions.filter((m: any) => {
@@ -148,24 +187,29 @@ export class MissionManager implements OnInit {
     this.stats.joined = this.joinedMissions.length;
     this.stats.total = this.stats.leading + this.stats.joined;
     this.stats.open = [...this.leadingMissions, ...this.joinedMissions]
-                      .filter(m => m.status === 'Open').length;
+      .filter(m => m.status === 'Open').length;
   }
 
   openDialog() {
     const ref = this._dialog.open(NewMission, {
       width: '500px'
     });
-    
+
     ref.afterClosed().subscribe(async (addMission: AddMission) => {
       if (!addMission) return;
 
       try {
         await this._missionService.add(addMission);
         await this.loadMyMission();
-      } catch (error) {
+      } catch (error: any) {
         console.error('❌ Error creating mission:', error);
-        alert('เกิดข้อผิดพลาดในการสร้างภารกิจ: ' + error);
+        const msg = typeof error.error === 'string' ? error.error : 'เกิดข้อผิดพลาดในการสร้างภารกิจ';
+        alert(msg);
       }
     });
+  }
+
+  getDifficultyClass(difficulty: string | undefined): string {
+    return (difficulty || 'NORMAL').toUpperCase();
   }
 }

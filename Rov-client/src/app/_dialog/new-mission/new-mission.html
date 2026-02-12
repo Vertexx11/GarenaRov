@@ -1,59 +1,78 @@
-<h2 mat-dialog-title>
-  {{ missionData.id ? 'Edit Mission (แก้ไข)' : 'New Mission (สร้างใหม่)' }}
-</h2>
+<div class="mission-dialog-container">
+  <h2 mat-dialog-title>
+    <div class="title-content">
+      <mat-icon>{{ missionData.id ? 'edit_note' : 'add_task' }}</mat-icon>
+      <span>{{ missionData.id ? 'Edit Mission (แก้ไข)' : 'New Mission (สร้างใหม่)' }}</span>
+    </div>
+  </h2>
 
-<mat-dialog-content>
-  <div class="form-container" style="display: flex; flex-direction: column; gap: 15px; min-width: 400px; padding-top: 5px;">
-    
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Mission Name</mat-label> 
-      <input matInput placeholder="Ex. Kill the Dragon" [(ngModel)]="missionData.name">
-    </mat-form-field>
+  <mat-dialog-content>
+    <div class="form-container">
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Description</mat-label>
-      <textarea matInput rows="4" [(ngModel)]="missionData.description"></textarea>
-    </mat-form-field>
-
-    <div style="display: flex; gap: 15px;">
-      <mat-form-field appearance="outline" style="flex: 1;">
-        <mat-label>Difficulty (ระดับความยาก)</mat-label>
-        <mat-select [(ngModel)]="missionData.difficulty">
-          <mat-option value="EASY">🟢 EASY (ง่าย)</mat-option>
-          <mat-option value="NORMAL">🔵 NORMAL (ปานกลาง)</mat-option>
-          <mat-option value="HARD">🔴 HARD (ยาก)</mat-option>
-          <mat-option value="EXTREME">🟣 EXTREME (โหดจัด)</mat-option>
-        </mat-select>
+      <!-- Name -->
+      <mat-form-field appearance="outline" class="full-width custom-field">
+        <mat-label>Mission Name</mat-label>
+        <input matInput placeholder="Ex. Kill the Dragon" [(ngModel)]="missionData.name">
+        <mat-icon matSuffix>title</mat-icon>
       </mat-form-field>
 
-      <mat-form-field appearance="outline" style="flex: 1;">
-        <mat-label>Base Points (แต้มรางวัล)</mat-label>
-        <input matInput type="number" min="1" placeholder="Ex. 5" [(ngModel)]="missionData.base_points">
+      <!-- Description -->
+      <mat-form-field appearance="outline" class="full-width custom-field">
+        <mat-label>Description</mat-label>
+        <textarea matInput rows="4" placeholder="Mission details..." [(ngModel)]="missionData.description"></textarea>
       </mat-form-field>
+
+      <!-- Row: Diff & Points -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Difficulty</mat-label>
+          <mat-select [(ngModel)]="missionData.difficulty" (selectionChange)="updatePoints()">
+            <mat-option value="EASY">
+              <span class="diff-badge easy">EASY</span> (ง่าย)
+            </mat-option>
+            <mat-option value="NORMAL">
+              <span class="diff-badge normal">NORMAL</span> (ปานกลาง)
+            </mat-option>
+            <mat-option value="HARD">
+              <span class="diff-badge hard">HARD</span> (ยาก)
+            </mat-option>
+
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Base Points</mat-label>
+          <input matInput type="number" readonly [(ngModel)]="missionData.base_points">
+          <span matSuffix class="suffix-text">PTS</span>
+        </mat-form-field>
+      </div>
+
+      <!-- Row: Crew & Status -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Max Crew</mat-label>
+          <input matInput type="number" min="1" [(ngModel)]="missionData.max_crew">
+          <mat-icon matSuffix>group</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="custom-field" *ngIf="missionData.id">
+          <mat-label>Status</mat-label>
+          <mat-select [(ngModel)]="missionData.status">
+            <mat-option value="Open">🔵 Open</mat-option>
+            <mat-option value="InProgress">🟡 In Progress</mat-option>
+            <mat-option value="Completed">🟢 Completed</mat-option>
+            <mat-option value="Failed">🔴 Failed</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
     </div>
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Max Crew (จำนวนคนสูงสุด)</mat-label>
-      <input matInput type="number" min="1" placeholder="Ex. 3" [(ngModel)]="missionData.max_crew">
-    </mat-form-field>
+  </mat-dialog-content>
 
-    <div *ngIf="missionData.id">
-      <label class="fw-bold mb-1 d-block">Status (สถานะ)</label>
-      <select [(ngModel)]="missionData.status" 
-              class="form-control"
-              style="padding: 10px; width: 100%; border: 1px solid #ccc; border-radius: 4px;">
-        <option value="Open">🔵 Open</option>
-        <option value="InProgress">🟡 In Progress</option>  
-        <option value="Completed">🟢 Completed</option>
-        <option value="Failed">🔴 Failed</option>
-      </select>
-    </div>
-
-  </div>
-</mat-dialog-content>
-
-<mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cancel</button>
-  <button mat-flat-button color="primary" (click)="onSubmit()">
-    {{ missionData.id ? 'Save Changes' : 'Create' }}
-  </button>
-</mat-dialog-actions>
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button mat-dialog-close class="cancel-btn">Cancel</button>
+    <button mat-flat-button color="primary" class="save-btn" (click)="onSubmit()">
+      {{ missionData.id ? 'Save Changes' : 'Create Mission' }}
+    </button>
+  </mat-dialog-actions>
+</div>

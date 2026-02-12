@@ -30,6 +30,11 @@ where
     }
 
     pub async fn join(&self, mission_id: i32, brawler_id: i32) -> Result<()> {
+        let daily_count = self.mission_viewing_repository.get_daily_interaction_count(brawler_id).await?;
+        if daily_count >= 3 {
+             return Err(anyhow::anyhow!("Daily mission limit (3) reached. You cannot create or join more missions today."));
+        }
+
         let max_crew_per_mission = std::env::var("MAX_CREW_PER_MISSION")
             .expect("missing value")
             .parse()?;

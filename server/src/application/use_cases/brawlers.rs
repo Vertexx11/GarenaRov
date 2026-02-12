@@ -31,9 +31,13 @@ where
         Self { brawler_repository }
     }
 
-    // 🌟 ย้ายเข้ามาในบล็อก impl และเรียกใช้ repository แทนการคิวรีฐานข้อมูลเอง
     pub async fn get_leaderboard(&self) -> Result<Vec<Brawler>, String> {
         self.brawler_repository.get_leaderboard().await
+    }
+
+    pub async fn get_me(&self, brawler_id: i32) -> Result<Brawler> {
+        let entity = self.brawler_repository.find_by_id(brawler_id).await?;
+        Ok(entity.into())
     }
 
     pub async fn register(&self, mut register_model: RegisterBrawlerModel) -> Result<Passport> {
@@ -55,9 +59,9 @@ where
         brawler_id: i32,
     ) -> Result<UploadedImage> {
         let option = UploadImageOptions {
-            folder: Some("brawlers_avatar".to_string()),
-            public_id: Some(brawler_id.to_string()),
-            transformation: Some("c_scale,w_256".to_string()),
+            folder: None,
+            public_id: None,
+            transformation: None,
         };
 
         let base64_image = Base64Image::new(&base64_image)?;
@@ -68,5 +72,18 @@ where
             .await?;
 
         Ok(uploaded_image)
+    }
+
+    pub async fn update_profile(
+        &self,
+        brawler_id: i32,
+        update_model: crate::domain::value_objects::brawler_model::UpdateBrawlerModel,
+    ) -> Result<Passport> {
+        let entity = self.brawler_repository.update_profile(brawler_id, update_model).await?;
+        
+        let passport = Passport::new(entity.id, entity.display_name.clone());
+        
+        
+        Ok(passport)
     }
 }

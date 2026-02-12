@@ -1,94 +1,93 @@
 <div class="mission-container">
-  
-  <div class="search-card">
-    <div class="header-title">
-      <span class="icon">🚀</span> Mission Control
+
+  <!-- Search/Filter Header -->
+  <div class="mission-header-card">
+    <div class="header-left">
+      <h1>Mission Control</h1>
+      <p>Select a mission to join and earn rewards.</p>
     </div>
-    
-    <div class="search-form">
-      <div class="input-group">
-        <input type="text" 
-               [ngModel]="filter.name" 
-               (ngModelChange)="filter.name = $event; onSubmit()" 
-               placeholder="ค้นหาชื่อภารกิจ..." 
-               class="form-control">
+
+    <div class="search-controls">
+      <div class="search-input-wrapper">
+        <i class="fa-solid fa-search search-icon"></i>
+        <input type="text" [(ngModel)]="filter.name" (ngModelChange)="onSubmit()" placeholder="Search missions..."
+          class="modern-input">
       </div>
-      
-      <div class="input-group">
-        <select [ngModel]="filter.status" 
-                (ngModelChange)="filter.status = $event; onSubmit()"
-                class="form-control status-select">
-          <option value="">-- ทั้งหมด --</option>
-          <option value="Open">🔵 Open</option>
-          <option value="InProgress">🟡 In Progress</option>
-          <option value="Completed">🟢 Completed</option>
-          <option value="Closed">🔴 Closed</option>
+
+      <div class="filter-select-wrapper">
+        <select [(ngModel)]="filter.status" (ngModelChange)="onSubmit()" class="modern-select">
+          <option [ngValue]="undefined">All Status</option>
+          <option value="Open">Open</option>
+          <option value="InProgress">In Progress</option>
+          <option value="Completed">Completed</option>
         </select>
       </div>
 
-      <button (click)="onSubmit()" class="btn-search">
-        ค้นหา
+      <button (click)="onSubmit()" class="refresh-btn">
+        <span class="material-icons">refresh</span>
       </button>
     </div>
   </div>
 
-  <div class="results-card">
-    <div class="table-responsive">
-      <table class="mission-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>MISSION NAME</th>
-            <th>DESCRIPTION</th>
-            <th>DIFFICULTY</th>
-            <th>POINTS</th>
-            <th>CHIEF ID</th>
-            <th>CREW</th>
-            <th>STATUS</th>
-            <th>CREATED AT</th>
-            <th>ACTION</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (mission of missions; track mission.id) {
-            <tr>
-              <td class="text-muted">#{{ mission.id }}</td>
-              <td class="fw-bold">{{ mission.name }}</td>
-              <td class="text-desc">{{ mission.description || '-' }}</td>
-              
-              <td>
-                <span [ngStyle]="{
-                  'color': mission.difficulty === 'HARD' ? '#ef4444' : 
-                           mission.difficulty === 'NORMAL' ? '#3b82f6' : '#10b981',
-                  'font-weight': 'bold'
-                }">
-                  {{ mission.difficulty || 'NORMAL' }}
-                </span>
-              </td>
+  <!-- Mission Grid -->
+  <div class="mission-grid">
+    @for (mission of missions; track mission.id) {
+    <div class="mission-card" [ngClass]="getDifficultyClass(mission.difficulty)">
 
-              <td class="fw-bold">{{ mission.base_points || 0 }} pts</td>
+      <div class="card-header">
+        <div class="mission-badges">
+          <span class="id-badge">#{{ mission.id }}</span>
+          <span class="difficulty-badge" [ngClass]="getDifficultyClass(mission.difficulty)">
+            {{ mission.difficulty || 'NORMAL' }}
+          </span>
+        </div>
+        <span class="status-badge" [ngClass]="mission.status.toLowerCase()">{{ mission.status }}</span>
+      </div>
 
-              <td><div class="chief-badge">👮 {{ mission.chief_id }}</div></td>
-              <td>{{ mission.crew_count }} / {{ mission.max_crew || 3 }}</td>
-              <td>
-                <span class="status-badge" [ngClass]="{'open': mission.status === 'Open'}">
-                  {{ mission.status }}
-                </span>
-              </td>
-              <td class="text-date">{{ mission.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
-              <td>
-                @if (mission.crew_count >= (mission.max_crew || 3)) {
-                   <button class="btn-join disabled" disabled>Full</button>
-                } @else {
-                   <button class="btn-join" (click)="joinMission(mission.id)">Join</button>
-                }
-              </td>
-            </tr>
-          } @empty {
-            <tr><td colspan="10" class="no-data">ไม่พบข้อมูลภารกิจ</td></tr>
-          }
-        </tbody>
-      </table>
+      <h3 class="mission-title">{{ mission.name }}</h3>
+      <p class="mission-desc">{{ mission.description || 'No description provided.' }}</p>
+
+      <div class="mission-meta">
+        <div class="meta-item points">
+          <span class="material-icons">emoji_events</span>
+          <span>{{ mission.base_points || 0 }} pts</span>
+        </div>
+
+        <div class="meta-item chief">
+          <span class="material-icons">manage_accounts</span>
+          <span>Chief {{ mission.chief_id }}</span>
+        </div>
+      </div>
+
+      <div class="crew-progress">
+        <div class="progress-label">
+          <span>Crew</span>
+          <span>{{ mission.crew_count }} / {{ mission.max_crew || 3 }}</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" [style.width.%]="((mission.crew_count || 0) / (mission.max_crew || 3)) * 100">
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <span class="created-date">{{ mission.created_at | date:'MMM d, HH:mm' }}</span>
+
+        @if (mission.crew_count >= (mission.max_crew || 3)) {
+        <button class="join-btn full" disabled>Full</button>
+        } @else {
+        <button class="join-btn" (click)="joinMission(mission.id)">
+          Join Mission
+        </button>
+        }
+      </div>
+
     </div>
+    } @empty {
+    <div class="no-data-state">
+      <span class="material-icons">search_off</span>
+      <p>No missions found matching your criteria.</p>
+    </div>
+    }
   </div>
 </div>

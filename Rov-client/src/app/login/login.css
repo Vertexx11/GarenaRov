@@ -1,152 +1,122 @@
-/* Global reset/sizing for this component context */
-:host {
-    display: block;
-    font-family: 'Roboto', 'Helvetica Neue', sans-serif;
-}
-
+/* Restored to Stage 2 Scale for Login */
 .login-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    /* Clean modern gradient */
-    /* Alternative Dark Theme if preferred:
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-    */
-    padding: 20px;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    z-index: 100;
+}
+
+.login-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(248, 250, 252, 0.6);
+    backdrop-filter: blur(8px);
+    z-index: 0;
 }
 
 .login-card {
-    background: #ffffff;
-    padding: 2.5rem;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 5px 10px rgba(0, 0, 0, 0.01);
-    width: 100%;
-    max-width: 420px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.login-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+    position: relative;
+    z-index: 1;
+    width: 90%;
+    max-width: 380px;
+    /* Restored from 360 */
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    padding: 2rem;
+    /* Restored from 1.75 */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    animation: fadeInUp 0.6s ease-out backwards;
+    margin: auto;
 }
 
 .login-header {
     text-align: center;
-    margin-bottom: 2rem;
-}
-
-.login-header h2 {
-    margin: 0 0 0.5rem 0;
-    font-size: 2rem;
-    font-weight: 700;
-    color: #1a1a1a;
-}
-
-.login-header .subtitle {
-    margin: 0;
-    font-size: 0.95rem;
-    color: #666;
-}
-
-.login-form {
-    display: flex;
-    flex-direction: column;
-}
-
-.full-width {
-    width: 100%;
-    margin-bottom: 0.5rem;
-}
-
-/* Remove underline from Material form fields */
-::ng-deep .mat-mdc-form-field-focus-overlay {
-    background-color: transparent !important;
-}
-
-::ng-deep .mat-mdc-text-field-wrapper {
-    background-color: #f8f9fa !important;
-    border-radius: 8px !important;
-}
-
-::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) {
-    background-color: #f8f9fa !important;
-}
-
-::ng-deep .mdc-line-ripple::before,
-::ng-deep .mdc-line-ripple::after {
-    border-bottom-style: none !important;
-}
-
-::ng-deep .mat-mdc-form-field-subscript-wrapper {
-    margin-top: 4px;
-}
-
-.submit-btn {
-    margin-top: 1rem;
-    height: 50px;
-    font-size: 1rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    background-color: #3448c5;
-    /* Original primary blue, preserved per request context or similar */
-    color: white;
-    border-radius: 8px;
-    /* Slightly softer corners */
-}
-
-.submit-btn:disabled {
-    background-color: #e0e0e0;
-    color: #9e9e9e;
-}
-
-.login-footer {
-    margin-top: 2rem;
-}
-
-.divider {
-    display: flex;
-    align-items: center;
-    color: #a2abb4;
     margin-bottom: 1.5rem;
 }
 
-.divider::before,
-.divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background-color: #e0e0e0;
+.login-header h2 {
+    color: var(--text-main);
+    font-size: 1.75rem;
+    margin-bottom: 0.25rem;
+    font-weight: 700;
 }
 
-.divider span {
-    padding: 0 10px;
+.login-header .subtitle {
+    color: var(--text-muted);
     font-size: 0.85rem;
-    text-transform: uppercase;
-    font-weight: 500;
 }
 
-.toggle-text {
-    text-align: center;
+mat-form-field {
+    width: 100%;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+::ng-deep .mat-mdc-text-field-wrapper {
+    background-color: rgba(255, 255, 255, 0.5) !important;
+    border-radius: 8px !important;
+    border: 1px solid #e2e8f0;
+    padding: 0 12px;
+    height: 50px;
+}
+
+::ng-deep .mat-mdc-form-field-flex {
+    height: 50px !important;
+    padding-top: 0 !important;
+    align-items: center !important;
+}
+
+/* Proper centering for button */
+.submit-btn {
+    width: 100%;
+    padding: 0.8rem;
+    /* Restored */
+    background-color: var(--primary-accent) !important;
+    color: white !important;
     font-size: 0.95rem;
-    color: #666;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: block;
+    margin-top: 10px;
+    height: 48px;
+    line-height: 1;
 }
 
-.action-link {
-    color: #3448c5;
+.submit-btn:hover {
+    background-color: #4338ca !important;
+    transform: translateY(-1px);
+}
+
+.login-footer {
+    margin-top: 1.2rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.link {
+    color: var(--primary-accent);
+    text-decoration: none;
     font-weight: 600;
     cursor: pointer;
-    text-decoration: none;
-    transition: color 0.2s;
 }
 
-.action-link:hover {
-    color: #263691;
+.link:hover {
     text-decoration: underline;
-}
-
-/* Error text styling adjustment */
-mat-error {
-    font-size: 0.75rem;
 }

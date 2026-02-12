@@ -35,7 +35,10 @@ impl MissionOperationPostgres {
                 .filter(missions::id.eq(mission_id))
                 .filter(missions::chief_id.eq(chief_id))
                 .filter(missions::deleted_at.is_null())
-                .set((missions::status.eq(status_string),))
+                .set((
+                    missions::status.eq(status_string),
+                    missions::updated_at.eq(diesel::dsl::now),
+                ))
                 .returning(missions::id)
                 .get_result::<i32>(&mut conn)
                 .context("Failed to execute mission update query")

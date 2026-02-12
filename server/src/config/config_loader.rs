@@ -51,9 +51,11 @@ pub fn get_jwt_env() -> Result<JwtEnv> {
 
     let secret = std::env::var("JWT_USER_SECRET")
         .expect("JWT_USER_SECRET is valid")
-        .parse()?;
+        .trim()
+        .to_string();
 
     let life_time_days = std::env::var("JWT_LIFE_TIME_DAYS")?
+        .trim()
         .parse::<i64>()?;
 
     Ok(JwtEnv {
@@ -66,11 +68,17 @@ pub fn get_jwt_env() -> Result<JwtEnv> {
 pub fn get_cloundinary_env() -> Result<CloudinaryEnv> {
     dotenvy::dotenv().ok();
 
-    let cloud_name = std::env::var("CLOUDINARY_CLOUD_NAME")?;
+    let cloud_name = std::env::var("CLOUDINARY_CLOUD_NAME")?
+        .trim()
+        .to_string();
 
-    let api_key = std::env::var("CLOUDINARY_API_KEY")?;
+    let api_key = std::env::var("CLOUDINARY_API_KEY")?
+        .trim()
+        .to_string();
 
-    let api_secret = std::env::var("CLOUDINARY_API_SECRET")?;
+    let api_secret = std::env::var("CLOUDINARY_API_SECRET")?
+        .trim()
+        .to_string();
 
     Ok(CloudinaryEnv {
         cloud_name,

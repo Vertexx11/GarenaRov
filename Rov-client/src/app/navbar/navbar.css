@@ -1,35 +1,95 @@
-.my-navbar {
-  font-family: 'Inter', sans-serif; 
+mat-toolbar.my-navbar {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 98%;
+  max-width: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 1);
+  box-shadow: 0 2px 8px -1px rgba(0, 0, 0, 0.05);
+  color: var(--text-main);
+  z-index: 1000;
+
+  /* Changed from space-between to flex-start + gap for tighter grouping */
+  display: flex;
+  justify-content: flex-start;
+  gap: 8px;
+  /* Close gap between items */
+
+  padding: 0 1rem;
+  height: 56px;
 }
 
+/* Spacer to push Profile to the right */
 .spacer {
-  flex: 1 1 auto; 
+  flex: 1 1 auto;
 }
 
-.mat-mdc-button {
-  font-size: 15px !important;
-  font-weight: 600 !important;
-  margin: 0 4px;
-  border-radius: 50px !important; 
-  transition: all 0.2s ease-in-out !important;
+button[mat-button] {
+  color: var(--text-muted);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  line-height: normal;
+  /* Reset line-height to prevent layout issues */
+  padding: 6px 16px;
+  height: 40px;
+  /* Fixed height */
+  border-radius: 8px;
+
+  /* Ensure internal flex layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  /* Space between icon and text */
 }
 
-.active, .mat-mdc-button:hover {
-  background-color: #eff6ff !important; 
-  color: #2563eb !important;          
+button[mat-button]:hover,
+button[mat-button].active {
+  color: var(--primary-accent);
+  background: #eff6ff;
 }
 
-mat-icon {
-  margin-right: 4px;
-  vertical-align: middle;
+button[mat-button] mat-icon {
+  margin: 0;
+  /* Remove old margin */
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
 }
 
+/* Profile specific adjustment */
 .avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  margin-right: 8px;
-  vertical-align: middle;
-  border: 2px solid rgba(255,255,255,0.8);
-  object-fit: cover; 
+  border: 2px solid #e2e8f0;
+  margin: 0;
+  /* Handled by gap */
+  object-fit: cover;
+}
+
+/* Ensure profile button content is strictly row */
+button[mat-button]>span {
+  display: flex;
+  /* Helps vertically align text if needed */
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  mat-toolbar.my-navbar {
+    height: 50px;
+    top: 0;
+    border-radius: 0;
+    padding: 0 0.5rem;
+    gap: 4px;
+    width: 100%;
+  }
 }

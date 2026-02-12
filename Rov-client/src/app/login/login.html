@@ -1,11 +1,13 @@
 <div class="login-page">
   <div class="login-card">
     <div class="login-header">
-      <h2>{{ mode === 'login' ? 'Welcome Back' : 'Create Account' }}</h2>
-      <p class="subtitle">{{ mode === 'login' ? 'Please sign in to continue' : 'Sign up to get started' }}</p>
+      <h2 class="fade-in-up">{{ mode === 'login' ? 'Welcome Back' : 'Create Account' }}</h2>
+      <p class="subtitle fade-in-up delay-100">{{ mode === 'login' ? 'Please sign in to continue' : 'Sign up to get
+        started' }}</p>
     </div>
 
-    <form [formGroup]="form" autocomplete="off" class="login-form" (ngSubmit)="onSubmit()"> <mat-form-field appearance="fill" class="full-width">
+    <form [formGroup]="form" autocomplete="off" class="login-form fade-in-up delay-200" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="fill" class="full-width">
         <mat-label>Username</mat-label>
         <input matInput type="text" placeholder="Enter your username" (input)="updateErrorMessage('username')"
           formControlName="username" />
@@ -46,16 +48,16 @@
       }
 
       @if (errorFromServer !== '') {
-        <div class="server-error-msg" style="color: red; text-align: center; margin-bottom: 10px; font-size: 0.9em;">
-            <i class="fa-solid fa-circle-exclamation"></i> {{ errorFromServer }}
-        </div>
+      <div class="server-error-msg" style="color: red; text-align: center; margin-bottom: 10px; font-size: 0.9em;">
+        <i class="fa-solid fa-circle-exclamation"></i> {{ errorFromServer }}
+      </div>
       }
       <button mat-flat-button color="primary" type="submit" class="submit-btn" [disabled]="!form.valid">
         {{ mode === 'login' ? 'Log In' : 'Sign Up' }}
       </button>
     </form>
 
-    <div class="login-footer">
+    <div class="login-footer fade-in-up delay-300">
       <div class="divider">
         <span>or</span>
       </div>

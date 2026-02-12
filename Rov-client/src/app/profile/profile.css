@@ -1,43 +1,248 @@
-/* คอนเทนเนอร์หลัก จัดทุกอย่างให้อยู่ตรงกลาง */
+/* Profile Container */
 .profile-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 80px 20px 40px;
+  width: 100%;
+}
+
+.profile-card {
+  width: 100%;
+  max-width: 450px;
+  background: white;
+  /* Clean white background like screenshot */
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  /* Soft shadow */
+  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.profile-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+}
+
+/* Banner */
+.profile-banner {
+  height: 140px;
+  background-image: url('https://wallpapers.com/images/hd/rov-arena-of-valor-background-1920-x-1080-n4m9n3k8j2l5h6g7.jpg');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.profile-banner .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(79, 70, 229, 0.3), rgba(30, 41, 59, 0.6));
+}
+
+/* Header Content */
+.profile-header-content {
+  padding: 0 24px;
+  margin-top: -50px;
+  /* Overlap */
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 50px; /* เว้นระยะจากด้านบน */
-  gap: 20px;
+  position: relative;
+  z-index: 10;
 }
 
-/* กรอบหุ้มรูปและปุ่ม */
-.avatar-wrapper {
-  position: relative; /* สำคัญ! เพื่อให้ปุ่มอ้างอิงตำแหน่งจากกล่องนี้ */
-  width: 180px;      /* กำหนดขนาดรูป */
-  height: 180px;
+.avatar-group {
+  position: relative;
+  margin-bottom: 12px;
 }
 
-/* ตัวรูปภาพ */
+.avatar-ring {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  padding: 4px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 .avatar-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;  /* ให้รูปเต็มกรอบโดยไม่เบี้ยว */
-  border-radius: 50%; /* ทำเป็นวงกลม */
-  border: 5px solid #ffffff; /* ขอบสีขาว */
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* เงานุ่มๆ */
-  background-color: #f0f0f0; /* สีพื้นหลังกันรููปโหลดไม่ทัน */
+  border-radius: 50%;
+  object-fit: cover;
+  background: #f1f5f9;
 }
 
-/* ปุ่มแก้ไข */
 .edit-btn {
   position: absolute;
-  bottom: 10px;
-  right: 10px;
-  /* เพิ่มเงาให้ปุ่มดูเด่น */
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important; 
+  bottom: 0px;
+  right: 0px;
+  background: #4f46e5;
+  color: white;
+  border: 2px solid white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
 }
 
-/* ชื่อโปรไฟล์ */
-.profile-name {
-  color: #333;
-  font-size: 24px;
-  font-weight: 500;
+.edit-btn:hover {
+  background: #4338ca;
+  transform: scale(1.1);
+}
+
+.edit-btn mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* User Info */
+.user-info {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.display-name {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 4px;
+  letter-spacing: -0.5px;
+}
+
+.username {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 0 0 12px;
+}
+
+.rank-badge {
+  display: inline-block;
+  background: #eff6ff;
+  color: #3b82f6;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Stats Card - THE REQUESTED STYLE */
+.stats-card {
+  display: flex;
+  justify-content: space-evenly;
+  /* Spread evenly */
+  align-items: center;
+  padding: 24px 0;
+  border-top: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
+  background: white;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 80px;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  /* Large number */
+  font-weight: 800;
+  color: #0f172a;
+  /* Dark Blue/Black */
+  line-height: 1.2;
+}
+
+/* Specific color for Points as seen in screenshot */
+.stat-item:nth-child(2) .stat-value {
+  color: #d97706;
+  /* Orange/Gold for Points */
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  color: #64748b;
+  /* Muted Grey */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+/* Bio */
+.profile-bio {
+  padding: 24px;
+  text-align: center;
+}
+
+.profile-bio h3 {
+  font-size: 0.8rem;
+  color: #0f172a;
+  margin: 0 0 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profile-bio p {
+  font-size: 0.9rem;
+  color: #64748b;
+  line-height: 1.5;
   margin: 0;
+}
+
+/* Actions */
+.profile-actions {
+  padding: 0 24px 24px;
+  display: flex;
+  gap: 12px;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 10px !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  box-shadow: none !important;
+}
+
+.action-btn.outline {
+  border: 1px solid #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+/* Animation */
+.fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

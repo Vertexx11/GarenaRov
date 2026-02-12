@@ -1,0 +1,35 @@
+<div class="shop-container">
+    <!-- Header -->
+    <div class="shop-header">
+        <div class="header-content">
+            <h1>Reward Shop</h1>
+            <p>Redeem your hard-earned points for exclusive items!< /p>
+        </div>
+        <div class="points-display">
+            <mat-icon>monetization_on</mat-icon>
+            <div class="points-info">
+                <span class="label">Your Points</span>
+                <span class="value">{{ myPoints }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Items Grid -->
+    <div class="items-grid">
+        <div class="reward-card" *ngFor="let item of items">
+            <div class="card-icon-bg">
+                <mat-icon>{{ item.icon }}</mat-icon>
+            </div>
+            <div class="card-content">
+                <h3>{{ item.name }}</h3>
+                <p>{{ item.description }}</p>
+                <div class="cost-row">
+                    <span class="cost">{{ item.cost }} PTS</span>
+                    <button mat-flat-button color="primary" [disabled]="myPoints < item.cost" (click)="redeem(item)">
+                        {{ myPoints >= item.cost ? 'Redeem' : 'Not Enough' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

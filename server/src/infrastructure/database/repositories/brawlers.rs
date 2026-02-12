@@ -54,6 +54,17 @@ impl BrawlerRepository for BrawlerPostgres {
 
         Ok(result)
     }
+
+    async fn find_by_id(&self, brawler_id: i32) -> Result<BrawlerEntity> {
+        let mut connection = Arc::clone(&self.db_pool).get()?;
+
+        let result = brawlers::table
+            .find(brawler_id)
+            .select(BrawlerEntity::as_select())
+            .first::<BrawlerEntity>(&mut connection)?;
+
+        Ok(result)
+    }
     
     async fn upload_avatar(
         &self,
@@ -96,5 +107,38 @@ impl BrawlerRepository for BrawlerPostgres {
 
     async fn get_missions(&self, _brawler_id: i32) -> Result<Vec<MissionEntity>> {
         todo!()
+    }
+
+    async fn update_profile(&self, brawler_id: i32, update_model: crate::domain::value_objects::brawler_model::UpdateBrawlerModel) -> Result<BrawlerEntity> {
+        let mut conn = Arc::clone(&self.db_pool).get()?;
+
+        if let Some(ref d_name) = update_model.display_name {
+             diesel::update(brawlers::table)
+                .filter(brawlers::id.eq(brawler_id))
+                .set(brawlers::display_name.eq(d_name))
+                .execute(&mut conn)?;
+        }
+
+        if let Some(ref u_name) = update_model.username {
+             diesel::update(brawlers::table)
+                .filter(brawlers::id.eq(brawler_id))
+                .set(brawlers::username.eq(u_name))
+                .execute(&mut conn)?;
+        }
+
+        let entity = brawlers::table
+            .filter(brawlers::id.eq(brawler_id))
+            .select(BrawlerEntity::as_select())
+            .first::<BrawlerEntity>(&mut conn)?;
+            
+        Ok(entity)
+    }
+    async fn add_points(&self, brawler_id: i32, points: i32) -> Result<()> {
+        let mut conn = Arc::clone(&self.db_pool).get()?;
+        diesel::update(brawlers::table)
+             .filter(brawlers::id.eq(brawler_id))
+             .set(brawlers::total_points.eq(brawlers::total_points + points))
+             .execute(&mut conn)?;
+        Ok(())
     }
 }

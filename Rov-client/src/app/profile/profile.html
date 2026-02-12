@@ -1,13 +1,57 @@
-<div class="profile-container">
-  
-  <div class="avatar-wrapper">
-    <img [src]="avatar_url()" alt="User Avatar" class="avatar-img" />
+<div class="profile-container fade-in-up">
 
-    <button mat-mini-fab color="primary" class="edit-btn" (click)="openDialog()">
-      <mat-icon>edit</mat-icon>
-    </button>
+  <div class="profile-card">
+    <!-- Header / Banner -->
+    <div class="profile-banner">
+      <div class="overlay"></div>
+    </div>
+
+    <!-- Avatar Section -->
+    <div class="profile-header-content">
+      <div class="avatar-group">
+        <div class="avatar-ring">
+          <img [src]="avatar_url() || 'https://www.w3schools.com/howto/img_avatar.png'" alt="User Avatar"
+            class="avatar-img" />
+        </div>
+        <button class="edit-btn" (click)="openDialog()">
+          <mat-icon>photo_camera</mat-icon>
+        </button>
+      </div>
+
+      <div class="user-info">
+        <h1 class="display-name">{{ user_data()?.display_name || 'Guest User' }}</h1>
+        <p class="username">@{{ user_data()?.username || 'unknown' }}</p>
+        <span class="rank-badge">Warrior</span>
+      </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats-card">
+      <div class="stat-item">
+        <span class="stat-value">{{ stats.missions }}</span>
+        <span class="stat-label">MISSIONS</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ stats.points }}</span>
+        <span class="stat-label">POINTS</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">#{{ stats.rank || '-' }}</span>
+        <span class="stat-label">RANK</span>
+      </div>
+    </div>
+
+    <!-- Content / Bio -->
+    <div class="profile-bio">
+      <h3>About</h3>
+      <p>{{ user_data()?.bio || 'Ready to conquer the arena. Awaiting new missions.' }}</p>
+    </div>
+
+    <!-- Actions -->
+    <div class="profile-actions">
+      <button mat-flat-button color="primary" class="action-btn" (click)="openEditProfile()">Edit Profile</button>
+      <button mat-stroked-button class="action-btn outline" (click)="openShop()">Redeem Points</button>
+    </div>
   </div>
-
-  <h2 class="profile-name">Your Profile!</h2>
 
 </div>

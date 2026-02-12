@@ -2,9 +2,10 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MissionService } from '../_services/mission-service';
+import { PassportService } from '../_services/passport-service';
 import { MissionFilter } from '../_models/mission-filter';
 import { Mission } from '../_models/mission';
-import { Brawler } from '../_models/brawler'; 
+import { Brawler } from '../_models/brawler';
 
 @Component({
   selector: 'app-missions',
@@ -18,19 +19,20 @@ import { Brawler } from '../_models/brawler';
 })
 export class Missions implements OnInit {
   private _missionService = inject(MissionService);
+  private _passportService = inject(PassportService);
 
   filter: MissionFilter = {
     status: undefined
   };
 
   missions: Mission[] = [];
-  topBrawlers: Brawler[] = []; 
+  topBrawlers: Brawler[] = [];
 
   constructor() { }
 
   ngOnInit() {
     this.onSubmit();
-    this.loadLeaderboard(); 
+    this.loadLeaderboard();
   }
   async loadLeaderboard() {
     try {
@@ -43,8 +45,7 @@ export class Missions implements OnInit {
 
   // --- โค้ดเดิมของคุณ (ห้ามลบ) ---
   get myUserId(): number {
-    const userStr = localStorage.getItem('user');
-    return userStr ? JSON.parse(userStr).id : 26;
+    return this._passportService.data()?.user?.id || 0;
   }
 
   async onSubmit() {
@@ -55,7 +56,10 @@ export class Missions implements OnInit {
       this.missions = results.filter(m => {
         const isNotMyOwn = m.chief_id !== this.myUserId;
         const isNotJoined = !joinedIds.includes(m.id);
-        return isNotMyOwn && isNotJoined;
+        const isCompleted = m.status === 'Completed';
+
+        // Show if it's (Not Mine AND Not Joined) OR (It is Completed)
+        return (isNotMyOwn && isNotJoined) || isCompleted;
       });
 
       console.log('Search results (Hidden Joined):', this.missions);
@@ -80,7 +84,8 @@ export class Missions implements OnInit {
       if (error.status === 404 || error.status === 200) {
         this.handleJoinSuccess(id);
       } else {
-        alert('เกิดข้อผิดพลาดในการเข้าร่วม');
+        const msg = typeof error.error === 'string' ? error.error : 'เกิดข้อผิดพลาดในการเข้าร่วม';
+        alert(msg);
       }
     }
   }
@@ -103,7 +108,7 @@ export class Missions implements OnInit {
   getStatusLabel(status: string): string {
     switch (status) {
       case 'Open': return 'เปิดรับสมัคร';
-      case 'InProgress': return 'กำลังดำเนินการ'; 
+      case 'InProgress': return 'กำลังดำเนินการ';
       case 'Completed': return 'ภารกิจสำเร็จ';
       case 'Failed': return 'ภารกิจล้มเหลว';
       case 'Closed': return 'ปิดรับสมัคร';
@@ -116,8 +121,12 @@ export class Missions implements OnInit {
       case 'Open': return 'badge-open';
       case 'InProgress': return 'badge-warning';
       case 'Completed': return 'badge-success';
-      case 'Failed': return 'badge-danger'; 
+      case 'Failed': return 'badge-danger';
       default: return 'badge-secondary';
     }
+  }
+
+  getDifficultyClass(difficulty: string | undefined): string {
+    return (difficulty || 'NORMAL').toUpperCase();
   }
 }

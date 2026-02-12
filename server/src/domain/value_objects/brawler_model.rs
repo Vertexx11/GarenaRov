@@ -33,3 +33,10 @@ pub struct BrawlerModel {
     #[diesel(sql_type = Integer)]  
     pub total_points: i32,         
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UpdateBrawlerModel {
+    pub display_name: Option<String>,
+    pub bio: Option<String>,
+    pub username: Option<String>,
+}

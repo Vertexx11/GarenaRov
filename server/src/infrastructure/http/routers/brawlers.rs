@@ -1,16 +1,18 @@
 use std::sync::Arc;
 
 use axum::{
-    Json, Router, extract::{Extension, State}, http::StatusCode, response::IntoResponse, routing::{get, post}
+    Json, Router,
+    extract::{Extension, State},
+    http::StatusCode,
+    response::IntoResponse,
+    routing::{get, post},
 };
 
 use crate::{
     application::use_cases::brawlers::BrawlersUseCase,
     domain::value_objects::{brawler_model::RegisterBrawlerModel, uploaded_image::UploadedAvartar},
     infrastructure::{
-        database::{
-            postgresql_connection::PgPoolSquad, repositories::brawlers::BrawlerPostgres,
-        },
+        database::{postgresql_connection::PgPoolSquad, repositories::brawlers::BrawlerPostgres},
         http::middleware::auth::authorization,
     },
 };
@@ -21,14 +23,15 @@ pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
 
     let protected_router = Router::new()
         .route("/avatar", post(upload_avatar))
+        .route("/me", get(get_me))
         .route("/my-missions", get(get_missions))
         .route_layer(axum::middleware::from_fn(authorization));
 
     Router::new()
         .merge(protected_router)
         .route("/register", post(register))
-        .route("/leaderboard", get(get_leaderboard)) 
-        .with_state(Arc::new(brawlers_use_case)) 
+        .route("/leaderboard", get(get_leaderboard))
+        .with_state(Arc::new(brawlers_use_case))
 }
 
 pub async fn get_leaderboard(
@@ -40,7 +43,6 @@ pub async fn get_leaderboard(
     }
 }
 
-
 pub async fn register(
     State(brawlers_use_case): State<Arc<BrawlersUseCase<BrawlerPostgres>>>,
     Json(register_brawler_model): Json<RegisterBrawlerModel>,
@@ -50,7 +52,6 @@ pub async fn register(
         Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }
 }
-
 
 pub async fn upload_avatar(
     State(brawlers_use_case): State<Arc<BrawlersUseCase<BrawlerPostgres>>>,
@@ -66,10 +67,19 @@ pub async fn upload_avatar(
     }
 }
 
-
 pub async fn get_missions(
     State(_brawlers_use_case): State<Arc<BrawlersUseCase<BrawlerPostgres>>>,
     Extension(_brawler_id): Extension<i32>,
 ) -> impl IntoResponse {
     (StatusCode::OK, Json(serde_json::json!({})))
+}
+
+pub async fn get_me(
+    State(brawlers_use_case): State<Arc<BrawlersUseCase<BrawlerPostgres>>>,
+    Extension(brawler_id): Extension<i32>,
+) -> impl IntoResponse {
+    match brawlers_use_case.get_me(brawler_id).await {
+        Ok(brawler) => (StatusCode::OK, Json(brawler)).into_response(),
+        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    }
 }

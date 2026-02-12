@@ -5,7 +5,8 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select'; 
+import { MatSelectModule } from '@angular/material/select';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-new-mission',
@@ -17,7 +18,8 @@ import { MatSelectModule } from '@angular/material/select';
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule 
+    MatSelectModule,
+    MatIconModule
   ],
   templateUrl: './new-mission.html',
   styleUrl: './new-mission.css'
@@ -39,9 +41,25 @@ export class NewMission {
         description: '',
         status: 'Open',
         max_crew: 3,
-        difficulty: 'NORMAL', 
-        base_points: 3        
+        difficulty: 'NORMAL',
+        base_points: 3
       };
+    }
+  }
+
+  updatePoints() {
+    switch (this.missionData.difficulty) {
+      case 'EASY':
+        this.missionData.base_points = 1;
+        break;
+      case 'NORMAL':
+        this.missionData.base_points = 3;
+        break;
+      case 'HARD':
+        this.missionData.base_points = 5;
+        break;
+      default:
+        this.missionData.base_points = 1;
     }
   }
 
@@ -57,8 +75,8 @@ export class NewMission {
       description: data.description?.trim() || undefined,
       status: data.status,
       max_crew: data.max_crew || 1,
-      difficulty: data.difficulty || 'NORMAL',    
-      base_points: Number(data.base_points) || 3  
+      difficulty: data.difficulty || 'NORMAL',
+      base_points: Number(data.base_points) || 3
     };
 
     return cleanData;

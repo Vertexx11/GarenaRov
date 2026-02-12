@@ -87,7 +87,8 @@ impl MissionViewingRepository for MissionViewingPostgres {
                 b.display_name,
                 COALESCE(b.avatar_url, '') AS avatar_url,
                 COALESCE(s.success_count, 0) AS mission_success_count, 
-                COALESCE(j.joined_count, 0) AS mission_joined_count
+                COALESCE(j.joined_count, 0) AS mission_joined_count,
+                b.total_points
             FROM 
                 crew_memberships cm
             INNER JOIN 
@@ -98,14 +99,14 @@ impl MissionViewingRepository for MissionViewingPostgres {
                         cm2.brawler_id, 
                         COUNT(*) AS success_count
                     FROM 
-                        crew_memberships cm2
+                        missions m2
                     INNER JOIN 
-                        missions m2 ON m2.id = cm2.mission_id
+                        crew_memberships cm2 ON cm2.mission_id = m2.id
                     WHERE 
-                        m2.status = 'completed' AND m2.id = $1
+                        m2.status = 'Completed'
                     GROUP BY 
                         cm2.brawler_id
-                ) s ON s.brawler_id = cm.brawler_id
+                ) s ON s.brawler_id = b.id
             LEFT JOIN 
                 (
                     SELECT 
@@ -124,6 +125,61 @@ impl MissionViewingRepository for MissionViewingPostgres {
             .bind::<diesel::sql_types::Int4, _>(mission_id)
             .load::<BrawlerModel>(&mut conn)?;
 
+        Ok(result)
+    }
+
+    async fn get_daily_interaction_count(&self, brawler_id: i32) -> Result<i64> {
+        let mut conn = Arc::clone(&self.db_pool).get()?;
+        let now = chrono::Utc::now();
+        let start_of_day = now.date_naive().and_hms_opt(0, 0, 0).unwrap();
+
+        let created_count: i64 = missions::table
+            .filter(missions::chief_id.eq(brawler_id))
+            .filter(missions::created_at.ge(start_of_day))
+            .count()
+            .get_result(&mut conn)?;
+
+        let joined_count: i64 = crew_memberships::table
+            .filter(crew_memberships::brawler_id.eq(brawler_id))
+            .filter(crew_memberships::joined_at.ge(start_of_day))
+            .count()
+            .get_result(&mut conn)?;
+
+        Ok(created_count + joined_count)
+    }
+
+    async fn get_daily_earned_points(&self, brawler_id: i32) -> Result<i64> {
+        let mut conn = Arc::clone(&self.db_pool).get()?;
+        let now = chrono::Utc::now();
+        let start_of_day = now.date_naive().and_hms_opt(0, 0, 0).unwrap();
+        let status_completed = "Completed".to_string();
+
+        // As Chief
+        let chief_points: Option<i64> = missions::table
+            .filter(missions::chief_id.eq(brawler_id))
+            .filter(missions::status.eq(&status_completed))
+            .filter(missions::updated_at.ge(start_of_day))
+            .select(diesel::dsl::sum(missions::base_points))
+            .get_result(&mut conn)?;
+
+        // As Crew
+        let crew_points: Option<i64> = crew_memberships::table
+            .inner_join(missions::table)
+            .filter(crew_memberships::brawler_id.eq(brawler_id))
+            .filter(missions::status.eq(&status_completed))
+            .filter(missions::updated_at.ge(start_of_day))
+            .select(diesel::dsl::sum(missions::base_points))
+            .get_result(&mut conn)?;
+
+        Ok(chief_points.unwrap_or(0) + crew_points.unwrap_or(0))
+    }
+
+    async fn get_crew_ids(&self, mission_id: i32) -> Result<Vec<i32>> {
+        let mut conn = Arc::clone(&self.db_pool).get()?;
+        let result = crew_memberships::table
+            .filter(crew_memberships::mission_id.eq(mission_id))
+            .select(crew_memberships::brawler_id)
+            .load::<i32>(&mut conn)?;
         Ok(result)
     }
 }

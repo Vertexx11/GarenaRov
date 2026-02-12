@@ -1,120 +1,139 @@
-/* คอนเทนเนอร์หลัก */
 .home-container {
-    min-height: 100vh;
-    background-color: #f5f7fa; /* สีพื้นหลังหลัก */
+    position: relative;
+    height: 100vh;
+    width: 100%;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8fafc;
+    background: linear-gradient(135deg, #fdfbfb 0%, #e2e8f0 100%);
+    overflow: hidden;
 }
 
-/* --- Hero Section --- */
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1)),
+        url('https://wallpapers.com/images/hd/rov-arena-of-valor-background-1920-x-1080-n4m9n3k8j2l5h6g7.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 1;
+    z-index: 1;
+}
+
 .hero-section {
-    background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%); /* ไล่สีน้ำเงินเข้ม */
-    color: white;
-    padding: 80px 20px;
+    position: relative;
+    z-index: 10;
     text-align: center;
-    border-bottom-left-radius: 50px;
-    border-bottom-right-radius: 50px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    padding: 1.5rem;
+    max-width: 1200px;
+    width: 100%;
 }
 
 .title {
     font-size: 3.5rem;
-    font-weight: 800;
-    margin-bottom: 16px;
-    letter-spacing: -1px;
-}
+    /* Restored from 3rem */
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
 
-.highlight {
-    color: #ffd700; /* สีทอง */
-    text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    background: linear-gradient(to right, #1e293b, #4f46e5);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: #1e293b;
+
+    line-height: 1.2;
+    padding: 0.5rem 0;
+    display: block;
+    letter-spacing: -1.5px;
+    font-family: 'Inter', sans-serif;
+
+    opacity: 0;
+    animation: fadeInUp 1s ease-out forwards, floatTitle 6s ease-in-out infinite 1s;
 }
 
 .subtitle {
-    font-size: 1.2rem;
-    opacity: 0.9;
-    margin-bottom: 40px;
-    font-weight: 300;
+    font-size: 1.1rem;
+    /* Restored size */
+    color: #334155;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    opacity: 0;
+    animation: fadeInUp 1s ease-out 0.3s forwards;
 }
 
-/* ปุ่มกดใน Hero */
-.cta-buttons {
+.cta-group {
     display: flex;
+    gap: 1rem;
     justify-content: center;
-    gap: 16px;
+    opacity: 0;
+    animation: fadeInUp 1s ease-out 0.6s forwards;
 }
 
-.btn-large {
-    padding: 24px 32px !important; /* ขยายปุ่มให้ใหญ่ */
-    font-size: 1.1rem !important;
-    border-radius: 50px !important;
+@keyframes floatTitle {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
 }
 
-.btn-outline {
-    color: white !important;
-    border-color: rgba(255,255,255,0.5) !important;
+button.glow-btn {
+    background: var(--primary-accent) !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    font-family: 'Inter', sans-serif !important;
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+    transition: all 0.3s ease;
+    padding: 0.8rem 2rem !important;
+    /* Restored padding */
+    font-size: 1rem !important;
+    /* Restored font */
+    border-radius: 10px !important;
 }
 
-/* --- Features Section --- */
-.features-section {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    padding: 60px 20px;
-    flex-wrap: wrap;
-    margin-top: -40px; /* ดันขึ้นไปเกยกับ Hero นิดนึงให้ดูมีมิติ */
+button.glow-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4);
+    background: #4338ca !important;
 }
 
-/* การ์ดแต่ละใบ */
-.feature-card {
-    background: white;
-    width: 280px;
-    padding: 30px;
-    border-radius: 20px;
-    text-align: center;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
+button.outline-btn {
+    border: 2px solid #cbd5e1 !important;
+    color: var(--text-main) !important;
+    font-family: 'Inter', sans-serif !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    padding: 0.8rem 2rem !important;
+    font-size: 1rem !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
 }
 
-/* เอฟเฟกต์ตอนเอาเมาส์ชี้ */
-.feature-card:hover {
-    transform: translateY(-10px); /* ลอยขึ้น */
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+button.outline-btn:hover {
+    background: #fff !important;
+    border-color: #94a3b8 !important;
+    transform: translateY(-2px);
 }
 
-.feature-card h3 {
-    margin: 20px 0 10px;
-    font-size: 1.25rem;
-    color: #333;
-}
+@media (max-width: 768px) {
+    .title {
+        font-size: 2.5rem;
+    }
 
-.feature-card p {
-    color: #666;
-    line-height: 1.6;
-    font-size: 0.95rem;
-}
-
-/* ไอคอนสวยๆ */
-.icon-wrapper {
-    width: 70px;
-    height: 70px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-    font-size: 32px;
-}
-
-/* สีพื้นหลังไอคอนแต่ละอัน */
-.color-1 { background-color: #e3f2fd; color: #1565c0; }
-.color-2 { background-color: #e8f5e9; color: #2e7d32; }
-.color-3 { background-color: #fff3e0; color: #ef6c00; }
-
-/* Responsive สำหรับมือถือ */
-@media (max-width: 600px) {
-    .title { font-size: 2.5rem; }
-    .hero-section { border-radius: 0 0 30px 30px; }
-    .features-section { margin-top: 0; }
-    .cta-buttons { flex-direction: column; }
+    .subtitle {
+        font-size: 1rem;
+    }
 }

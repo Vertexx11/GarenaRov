@@ -1,13 +1,130 @@
-/* จัด Layout ให้เป็นแนวตั้ง และกำหนดความกว้างขั้นต่ำ */
+/* Glass & Modern Styling */
+.mission-dialog-container {
+  padding: 10px;
+  background: white;
+}
+
+h2[mat-dialog-title] {
+  margin: 0 !important;
+  padding: 16px 24px !important;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.title-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 1.25rem;
+}
+
+.title-content mat-icon {
+  color: #4f46e5;
+}
+
+mat-dialog-content {
+  padding: 24px !important;
+  min-width: 450px;
+}
+
 .form-container {
   display: flex;
   flex-direction: column;
-  min-width: 400px; /* ปรับขนาดความกว้างของหน้าต่างตรงนี้ */
-  padding-top: 10px;
+  gap: 20px;
+  /* Increased gap */
 }
 
-/* สั่งให้ Input กว้างเต็มพื้นที่ 100% */
-.full-width {
-  width: 100%;
-  margin-bottom: 5px; /* เว้นระยะห่างระหว่างบรรทัดนิดนึง */
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.form-row>mat-form-field {
+  flex: 1;
+}
+
+/* Custom Field Styling - NO BORDERS */
+.custom-field ::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: #f8fafc !important;
+  /* Light background */
+  border-radius: 12px !important;
+  padding: 0 16px;
+  transition: all 0.2s;
+  /* Removed manual border */
+}
+
+/* Hide Default Material Outline Borders */
+.custom-field ::ng-deep .mdc-notched-outline__leading,
+.custom-field ::ng-deep .mdc-notched-outline__notch,
+.custom-field ::ng-deep .mdc-notched-outline__trailing {
+  border-color: transparent !important;
+  /* Hide border lines */
+  border-width: 0 !important;
+}
+
+/* Add focus effect (optional - shadow instead of border) */
+.custom-field.mat-focused ::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: #fff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  /* Soft shadow on focus */
+  transform: translateY(-1px);
+}
+
+.custom-field textarea {
+  resize: none;
+}
+
+.diff-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+.diff-badge.easy {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.diff-badge.normal {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.diff-badge.hard {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.diff-badge.extreme {
+  background: #7e22ce;
+  color: #fff;
+}
+
+.suffix-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  padding-right: 8px;
+}
+
+/* Actions */
+mat-dialog-actions {
+  padding: 16px 24px !important;
+  border-top: 1px solid #f1f5f9;
+  background-color: #fff;
+}
+
+.cancel-btn {
+  border-radius: 8px !important;
+  color: #64748b !important;
+}
+
+.save-btn {
+  border-radius: 8px !important;
+  padding: 0 24px !important;
+  font-weight: 600 !important;
 }

@@ -12,7 +12,14 @@ impl Base64Image {
             return Err(anyhow::anyhow!("Base64Image is empty !!"));
         }
 
-        let bytes = match general_purpose::STANDARD.decode(data) {
+        // Split "data:image/x;base64,..." to get raw base64
+        let clean_data = if let Some(idx) = data.find(",") {
+            &data[idx + 1..]
+        } else {
+            data
+        };
+
+        let bytes = match general_purpose::STANDARD.decode(clean_data) {
             Ok(bs) => bs,
             Err(_) => return Err(anyhow::anyhow!("Invalid base64 image data.")),
         };
@@ -25,7 +32,7 @@ impl Base64Image {
             _ => return Err(anyhow::anyhow!("Invalid base64 image data.")),
         };
 
-        Ok(Self(format!("data:{};base64,{}", file_type, &data)))
+        Ok(Self(format!("data:{};base64,{}", file_type, &clean_data)))
     }   
     pub fn into_inner(self) -> String {
         self.0

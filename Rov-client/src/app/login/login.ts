@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, PLATFORM_ID } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
@@ -7,6 +7,7 @@ import { PasswordValidator } from '../_helpers/password.validator';
 import { PasswordMatchValidator } from '../_helpers/password-match.validator';
 import { PassportService } from '../_services/passport-service';
 import { Router } from '@angular/router';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-login',
@@ -21,6 +22,7 @@ export class Login {
   private _routerService = inject(Router)
   private _passportService = inject(PassportService)
   errorFromServer = ''
+  private _platformId = inject(PLATFORM_ID);
 
   async onSubmit(): Promise<void> {
     try {
@@ -48,6 +50,13 @@ export class Login {
   }
 
   constructor() {
+    // Redirect if already logged in
+    if (isPlatformBrowser(this._platformId)) {
+      if (this._passportService.data()?.user) {
+        this._routerService.navigate(['/']);
+      }
+    }
+
     this.form = new FormGroup({
       username: new FormControl('', [
         Validators.required,
