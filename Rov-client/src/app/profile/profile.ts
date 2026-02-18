@@ -95,9 +95,9 @@ export class Profile implements OnInit {
 
       // Fetch all missions
       const allMissions: any = await this._missionService.gets({});
-      let missionsList = [];
+      let missionsList: any[] = [];
       if (Array.isArray(allMissions)) missionsList = allMissions;
-      else if (allMissions.data) missionsList = allMissions.data;
+      else if (allMissions && allMissions.data) missionsList = allMissions.data;
 
       const leadingCount = missionsList.filter((m: any) => m.chief_id == myId).length;
       const joinedCount = missionsList.filter((m: any) => m.chief_id != myId && joinedIds.includes(m.id)).length;
