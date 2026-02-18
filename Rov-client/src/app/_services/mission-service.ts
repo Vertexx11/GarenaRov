@@ -45,8 +45,13 @@ export class MissionService {
   }
 
   async join(missionId: number): Promise<any> {
-    const url = `${this._api_url}/mission-management/${missionId}/join`;
+    const url = `${this._api_url}/crew/join/${missionId}`;
     return await firstValueFrom(this._http.post(url, {}, { responseType: 'text' }));
+  }
+
+  async leave(missionId: number): Promise<any> {
+    const url = `${this._api_url}/crew/leave/${missionId}`;
+    return await firstValueFrom(this._http.delete(url, { responseType: 'text' }));
   }
 
   async update(id: number, data: AddMission): Promise<any> {
@@ -84,17 +89,17 @@ export class MissionService {
   // --- Mission Operations (Transitions) ---
   async start(id: number): Promise<any> {
     const url = `${this._api_url}/mission/in-progress/${id}`;
-    return await firstValueFrom(this._http.patch(url, {}));
+    return await firstValueFrom(this._http.patch(url, {}, { responseType: 'text' }));
   }
 
   async complete(id: number): Promise<any> {
     const url = `${this._api_url}/mission/to-completed/${id}`;
-    return await firstValueFrom(this._http.patch(url, {}));
+    return await firstValueFrom(this._http.patch(url, {}, { responseType: 'text' }));
   }
 
   async fail(id: number): Promise<any> {
     const url = `${this._api_url}/mission/to-failed/${id}`;
-    return await firstValueFrom(this._http.patch(url, {}));
+    return await firstValueFrom(this._http.patch(url, {}, { responseType: 'text' }));
   }
 
   private toQueryString(filter: MissionFilter): string {

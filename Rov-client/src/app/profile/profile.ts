@@ -56,43 +56,20 @@ export class Profile implements OnInit {
 
   async fetchStats() {
     try {
-      // 1. Get Points & Rank from Leaderboard
+      // 1. Get Me (Points)
+      const brawler = await this._missionService.getMe();
+      this.stats.points = brawler.total_points;
+
+      // 2. Get Rank from Leaderboard
       const leaderboard = await this._missionService.getLeaderboard();
-      const myName = this.user_data()?.display_name || 'Kinn';
+      const meIndex = leaderboard.findIndex((b: any) => b.id === brawler.id);
+      this.stats.rank = meIndex !== -1 ? meIndex + 1 : 0;
 
-      const meIndex = leaderboard.findIndex((b: any) => b.username === myName || b.username === 'Kinn');
-      if (meIndex !== -1) {
-        this.stats.points = leaderboard[meIndex].total_points;
-        this.stats.rank = meIndex + 1;
-      } else {
-        this.stats.points = 0;
-        this.stats.rank = 0;
-      }
-
-      // 2. Get Joined Missions Count
+      // 3. Get Missions Count
+      const myId = brawler.id;
       let joinedIds: any[] = [];
-      let myId = 26;
-
       if (isPlatformBrowser(this._platformId)) {
         joinedIds = JSON.parse(localStorage.getItem('my_joined_missions') || '[]');
-
-        const passportUser = this.user_data();
-        if (passportUser && passportUser.id) {
-          myId = passportUser.id;
-        } else {
-          if (isPlatformBrowser(this._platformId)) {
-            const userStr = localStorage.getItem('user');
-            if (userStr) {
-              try {
-                myId = JSON.parse(userStr).id;
-              } catch (e) { }
-            }
-          }
-        }
-      } else {
-        // Server side fallback (minimal)
-        const passportUser = this.user_data();
-        if (passportUser && passportUser.id) myId = passportUser.id;
       }
 
       // Fetch all missions

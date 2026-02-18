@@ -60,7 +60,7 @@ where
     match mission_operation_use_case.in_progress(mission_id, chief_id).await {
         Ok(mission_id) => {
             let response = format!(
-                "Mision ({}) is now {:?}",
+                "Mission ({}) is now {:?}",
                 mission_id,
                 MissionStatuses::InProgress
             );

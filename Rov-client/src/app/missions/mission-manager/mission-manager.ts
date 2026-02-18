@@ -65,7 +65,7 @@ export class MissionManager implements OnInit {
       this.stats.points = brawler.total_points;
       this.calculateStats();
       this.cdr.detectChanges();
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error fetching total points:', error);
       this.stats.points = 0;
       this.cdr.detectChanges();
@@ -100,7 +100,7 @@ export class MissionManager implements OnInit {
       await this._missionService.delete(mission.id);
       alert('🗑️ ลบภารกิจเรียบร้อย');
       await this.loadMyMission();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Delete failed:', error);
       alert('เกิดข้อผิดพลาดในการลบ');
     }
@@ -109,15 +109,20 @@ export class MissionManager implements OnInit {
   async onLeave(mission: Mission) {
     if (!confirm(`ต้องการออกจากภารกิจ "${mission.name}" ใช่หรือไม่?`)) return;
     try {
-      if (!isPlatformBrowser(this._platformId)) return;
-      const key = 'my_joined_missions';
-      let current: number[] = JSON.parse(localStorage.getItem(key) || '[]') as number[];
-      current = current.filter(id => id !== mission.id);
-      localStorage.setItem(key, JSON.stringify(current));
-      this.loadMyMission();
+      await this._missionService.leave(mission.id);
+
+      if (isPlatformBrowser(this._platformId)) {
+        const key = 'my_joined_missions';
+        let current: number[] = JSON.parse(localStorage.getItem(key) || '[]') as number[];
+        current = current.filter(id => id !== mission.id);
+        localStorage.setItem(key, JSON.stringify(current));
+      }
+
+      alert('ออกจากภารกิจสำเร็จ');
+      await this.loadMyMission();
     } catch (error: any) {
-      console.error(error);
-      alert('ออกจากภารกิจไม่สำเร็จ');
+      console.error('Leave failed:', error);
+      alert('ออกจากภารกิจไม่สำเร็จ: ' + (error.error || error.message));
     }
   }
 

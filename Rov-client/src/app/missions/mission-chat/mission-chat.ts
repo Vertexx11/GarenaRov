@@ -122,30 +122,8 @@ export class MissionChat implements OnInit, OnDestroy {
     }
 
     connectToMissionMembers() {
-        const myUserId = this.passport()?.user?.id;
-
-        this.members.forEach(member => {
-            if (member.id === myUserId) return; // Don't call self
-
-            const peerIdToCall = `rov-mission-${this.missionId}-user-${member.id}`;
-            console.log('Trying to call peer:', peerIdToCall);
-
-            if (!this.peer || !this.myStream) return;
-
-            const call = this.peer.call(peerIdToCall, this.myStream);
-
-            // If they are online and answer:
-            if (call) {
-                call.on('stream', (remoteStream) => {
-                    console.log('Connected to peer:', peerIdToCall);
-                    this.handleRemoteStream(peerIdToCall, remoteStream);
-                });
-
-                call.on('error', (err) => {
-                    console.log('Call error to ' + peerIdToCall, err);
-                });
-            }
-        });
+        // Initial connection to existing members
+        this.callMembers(this.members);
     }
 
     handleRemoteStream(peerId: string, stream: MediaStream) {
@@ -202,6 +180,7 @@ export class MissionChat implements OnInit, OnDestroy {
 
     stopAudioAnalysis() {
         if (this.updateInterval) clearInterval(this.updateInterval);
+        if (this.pollInterval) clearInterval(this.pollInterval);
 
         if (this.audioContext) {
             this.audioContext.close();
@@ -229,21 +208,83 @@ export class MissionChat implements OnInit, OnDestroy {
         this.stopAudioAnalysis();
     }
 
+    private pollInterval: any;
+
     async loadMission() {
         try {
             this.mission = await this._missionService.getOne(this.missionId);
-            // Fetch detailed members list
-            this.members = await this._missionService.getMembers(this.missionId);
-            this.memberCount = this.members.length;
 
-            // Init Audio AFTER we have members info (though practically we could do it parallel, 
-            // but we need members list for calling)
-            this.initAudioAndPeer();
+            // 1. Fetch members for the first time
+            const initialMembers = await this._missionService.getMembers(this.missionId);
+            this.updateMembers(initialMembers);
+
+            // 2. Initialize PeerJS (Done only once)
+            if (!this.peer) {
+                await this.initAudioAndPeer();
+            }
+
+            // 3. Setup Polling (every 5 seconds)
+            this.startPolling();
 
             this._cdr.markForCheck();
         } catch (e) {
             console.error('Error loading mission details', e);
         }
+    }
+
+    private startPolling() {
+        if (this.pollInterval) clearInterval(this.pollInterval);
+
+        this.pollInterval = setInterval(async () => {
+            try {
+                const refreshedMembers = await this._missionService.getMembers(this.missionId);
+                this.updateMembers(refreshedMembers);
+            } catch (e) {
+                console.warn('Polling members failed', e);
+            }
+        }, 5000);
+    }
+
+    private updateMembers(newMembers: Brawler[]) {
+        const myUserId = this.passport()?.user?.id;
+
+        // Find NEW members who weren't in our list before
+        const newJoiners = newMembers.filter(nm =>
+            nm.id !== myUserId &&
+            !this.members.some(m => m.id === nm.id)
+        );
+
+        this.members = newMembers;
+        this.memberCount = this.members.length;
+
+        // If we already have PeerJS setup, call the new joiners
+        if (this.peer && newJoiners.length > 0) {
+            console.log(`Found ${newJoiners.length} new joiners, initiating calls...`);
+            this.callMembers(newJoiners);
+        }
+
+        this._cdr.markForCheck();
+    }
+
+    private callMembers(targets: Brawler[]) {
+        if (!this.peer || !this.myStream) return;
+
+        targets.forEach(member => {
+            const peerIdToCall = `rov-mission-${this.missionId}-user-${member.id}`;
+
+            // Check if already connected/calling
+            if (this.remoteStreams.has(peerIdToCall)) return;
+
+            console.log('Automated call to new joiner:', peerIdToCall);
+            const call = this.peer!.call(peerIdToCall, this.myStream!);
+
+            if (call) {
+                call.on('stream', (remoteStream) => {
+                    this.handleRemoteStream(peerIdToCall, remoteStream);
+                });
+                call.on('error', (err) => console.log('Call error to ' + peerIdToCall, err));
+            }
+        });
     }
 
     toggleMic() {
