@@ -1,5 +1,5 @@
 import { Component, inject, PLATFORM_ID } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { PassportService } from '../_services/passport-service';
 import { environment } from '../../environments/environment';
@@ -13,7 +13,8 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    RouterModule
   ],
   templateUrl: './home.html',
   styleUrl: './home.css',
