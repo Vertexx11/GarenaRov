@@ -1,3 +1,3 @@
 export const environment = {
-    baseUrl: "https://garena-rov.vercel.app/api/"
+    baseUrl: "https://garenarov.onrender.com"
 };
