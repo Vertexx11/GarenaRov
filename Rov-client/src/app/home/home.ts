@@ -40,4 +40,8 @@ export class Home {
       error: (err) => console.error(err)
     });
   }
+
+  goToMissions() {
+    this._router.navigate(['/missions']);
+  }
 }
