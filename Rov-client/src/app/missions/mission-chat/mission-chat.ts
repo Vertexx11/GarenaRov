@@ -28,20 +28,23 @@ export class MissionChat implements OnInit, OnDestroy {
     members: Brawler[] = [];
     memberCount: number = 0;
 
+    // Voice States
     isMuted: boolean = false;
     isDeafened: boolean = false;
     isTalking: boolean = false;
     isAudioStarted: boolean = false;
 
+    // Audio Context (Visualization)
     private audioContext: AudioContext | undefined;
     private analyser: AnalyserNode | undefined;
     private microphone: MediaStreamAudioSourceNode | undefined;
     private dataArray: Uint8Array | undefined;
     private updateInterval: any;
 
+    // WebRTC / PeerJS
     private peer: Peer | undefined;
     private myStream: MediaStream | undefined;
-    remoteStreams: Map<string, MediaStream> = new Map();
+    remoteStreams: Map<string, MediaStream> = new Map(); // peerId -> Stream
 
     ngOnInit() {
         this._route.params.subscribe(params => {
@@ -59,9 +62,15 @@ export class MissionChat implements OnInit, OnDestroy {
         }
 
         try {
+            // 1. Get User Media
             this.myStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+            // 2. Setup Visualization
             this.setupAudioAnalysis(this.myStream);
+
+            // 3. Setup PeerJS
             this.setupPeerConnection();
+
             this.isAudioStarted = true;
             this._cdr.markForCheck();
         } catch (err) {
@@ -84,6 +93,7 @@ export class MissionChat implements OnInit, OnDestroy {
         const myUserId = this.passport()?.user?.id;
         if (!myUserId || !this.missionId) return;
 
+        // แก้ไข: ใช้ ID แบบมี Suffix เพื่อป้องกัน Ghost Session
         const randomId = Math.random().toString(36).substring(7);
         const myPeerId = `rov-mission-${this.missionId}-user-${myUserId}-${randomId}`;
 
@@ -101,7 +111,7 @@ export class MissionChat implements OnInit, OnDestroy {
 
         this.peer.on('open', (id) => {
             console.log('Connected to PeerServer with ID: ' + id);
-            this.connectToMissionMembers(); // เรียกใช้ฟังก์ชันที่เติมเข้ามาใหม่
+            this.connectToMissionMembers(); 
         });
 
         this.peer.on('call', (call) => {
@@ -122,12 +132,10 @@ export class MissionChat implements OnInit, OnDestroy {
         });
     }
 
-    // --- ส่วนที่เติมเพิ่มจากรูป image_d731c5.png ---
     connectToMissionMembers() {
         console.log('Connecting to existing members...');
         this.callMembers(this.members);
     }
-    // ------------------------------------------
 
     handleRemoteStream(peerId: string, stream: MediaStream) {
         if (this.remoteStreams.has(peerId)) return;
@@ -159,7 +167,7 @@ export class MissionChat implements OnInit, OnDestroy {
         document.body.appendChild(audio);
 
         audio.play().catch(async () => {
-            console.warn('Autoplay blocked. Waiting for user interaction.');
+            console.warn('Autoplay blocked. User needs to interact with the page first.');
             if (this.audioContext) await this.audioContext.resume();
         });
     }
@@ -220,31 +228,21 @@ export class MissionChat implements OnInit, OnDestroy {
 
     private updateMembers(newMembers: Brawler[]) {
         const myUserId = this.passport()?.user?.id;
-
-        // 1. Check if members actually changed to prevent UI flickering
         const currentIds = this.members.map(m => m.id).sort().join(',');
         const newIds = newMembers.map(m => m.id).sort().join(',');
 
-        if (currentIds === newIds && this.members.length === newMembers.length) {
-            // Data is same, do not replace reference
-            return;
-        }
+        if (currentIds === newIds && this.members.length === newMembers.length) return;
 
-        // Find NEW members who weren't in our list before
         const newJoiners = newMembers.filter(nm =>
-            nm.id !== myUserId &&
-            !this.members.some(m => m.id === nm.id)
+            nm.id !== myUserId && !this.members.some(m => m.id === nm.id)
         );
 
         this.members = newMembers;
         this.memberCount = this.members.length;
 
-        // If we already have PeerJS setup, call the new joiners
         if (this.peer && newJoiners.length > 0) {
-            console.log(`Found ${newJoiners.length} new joiners, initiating calls...`);
             this.callMembers(newJoiners);
         }
-
         this._cdr.markForCheck();
     }
 
@@ -256,15 +254,7 @@ export class MissionChat implements OnInit, OnDestroy {
         const myUserId = this.passport()?.user?.id;
         if (memberId === myUserId) return 'Connected';
 
-        // We can check if we have a stream for this user
-        // But peerId includes random suffix now, so we need to fuzzy match or just trust the member list + peer connection event
-        // Ideally we map memberId to peerIds, but for now let's check if we have ANY stream that contains the user ID in its label/peerId?
-        // Actually, we store remoteStreams by peerId.
-
         let isConnected = false;
-
-        // Check if any connected peer ID contains the user ID
-        // PeerID format: rov-mission-{id}-user-{userId}-{random}
         const pattern = `user-${memberId}-`;
 
         for (const peerId of this.remoteStreams.keys()) {
@@ -273,13 +263,13 @@ export class MissionChat implements OnInit, OnDestroy {
                 break;
             }
         }
-
         return isConnected ? 'Connected' : 'Connecting...';
     }
 
     private callMembers(targets: Brawler[]) {
         if (!this.peer || !this.myStream) return;
         targets.forEach(member => {
+            // สำคัญ: พยายามโทรหา ID เพื่อนโดยไล่เช็ค Suffix หรือใช้ระบบพื้นฐาน
             const peerIdToCall = `rov-mission-${this.missionId}-user-${member.id}`;
             const call = this.peer!.call(peerIdToCall, this.myStream!);
             if (call) {
