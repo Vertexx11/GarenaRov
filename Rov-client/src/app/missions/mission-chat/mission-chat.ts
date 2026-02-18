@@ -109,7 +109,7 @@
                         return;
                     }
                     if (this.analyser && this.dataArray) {
-                        this.analyser.getByteFrequencyData(this.dataArray);
+                        this.analyser!.getByteFrequencyData(this.dataArray as any);
                         let sum = 0;
                         for (let i = 0; i < this.dataArray.length; i++) sum += this.dataArray[i];
                         const average = sum / this.dataArray.length;
