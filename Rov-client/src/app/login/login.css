@@ -110,13 +110,21 @@ mat-form-field {
     color: var(--text-muted);
 }
 
-.link {
-    color: var(--primary-accent);
-    text-decoration: none;
-    font-weight: 600;
+.action-link {
+    color: #4f46e5;
+    font-weight: 800;
+    text-decoration: underline;
     cursor: pointer;
+    margin-left: 5px;
+    font-size: 1rem;
+    position: relative;
+    transition: all 0.2s;
+    text-underline-offset: 4px;
+    /* Added spacing for underline */
 }
 
-.link:hover {
-    text-decoration: underline;
+.action-link:hover {
+    color: #4338ca;
+    text-shadow: 0 0 15px rgba(79, 70, 229, 0.4);
+    text-decoration-thickness: 2px;
 }
