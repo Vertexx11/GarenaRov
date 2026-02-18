@@ -1,26 +1,17 @@
 {
   "version": 2,
   "public": true,
-  "builds": [
+  "name": "avengers-assembleclient",
+  "rewrites": [
     {
-      "src": "dist/Avengers-Assembleclient/server/server.mjs",
-      "use": "@vercel/node",
-      "config": {
-        "maxLambdaSize": "15mb"
-      }
-    },
-    {
-      "src": "dist/Avengers-Assembleclient/browser/**",
-      "use": "@vercel/static"
+      "source": "/(.*)",
+      "destination": "/api/main"
     }
   ],
-  "routes": [
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "dist/Avengers-Assembleclient/server/server.mjs"
+  "functions": {
+    "api/main.mjs": {
+      "runtime": "nodejs20.x",
+      "memory": 1024
     }
-  ]
+  }
 }
