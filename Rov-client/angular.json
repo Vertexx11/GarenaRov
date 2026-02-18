@@ -30,15 +30,14 @@
               "src/custom-theme.scss",
               "src/styles.css"
             ],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            },
+            "ssr": false,
+            "prerender": false,
             "allowedCommonJsDependencies": [
               "sdp",
               "ieee754",
-              "debug"
+              "debug",
+              "peerjs",
+              "zone.js"
             ]
           },
           "configurations": {
