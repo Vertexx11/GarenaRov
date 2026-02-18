@@ -179,7 +179,7 @@ export class MissionManager implements OnInit {
 
       const myId = this.myUserId;
       // 🌟 Filter out Completed from leading (User preference for active list)
-      this.leadingMissions = allMissions.filter((m: any) => m.chief_id == myId && m.status !== 'Completed');
+      this.leadingMissions = allMissions.filter((m: any) => m.chief_id == myId && m.status !== 'Completed' && m.status !== 'Failed');
 
       let joinedIds: number[] = [];
       if (isPlatformBrowser(this._platformId)) {
