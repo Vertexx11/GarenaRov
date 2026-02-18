@@ -3,7 +3,7 @@
   "public": true,
   "builds": [
     {
-      "src": "src/server.ts",
+      "src": "dist/Avengers-Assembleclient/server/server.mjs",
       "use": "@vercel/node",
       "config": {
         "maxLambdaSize": "15mb"
@@ -20,7 +20,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "src/server.ts"
+      "dest": "dist/Avengers-Assembleclient/server/server.mjs"
     }
   ]
 }
