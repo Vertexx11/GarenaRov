@@ -55,6 +55,11 @@ export class MissionChat implements OnInit, OnDestroy {
     }
 
     async initAudioAndPeer() {
+        if (this.peer && !this.peer.destroyed) {
+            console.warn('Peer already initialized. Skipping.');
+            return;
+        }
+
         try {
             // 1. Get User Media
             this.myStream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -94,8 +99,12 @@ export class MissionChat implements OnInit, OnDestroy {
         console.log('Initializing Peer with ID:', myPeerId);
 
         this.peer = new Peer(myPeerId, {
-            // Use default PeerJS cloud server (0.peerjs.com)
-            // You can configure your own TURN/STUN here if needed
+            config: {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:global.stun.twilio.com:3478' }
+                ]
+            },
             debug: 1
         });
 
@@ -115,9 +124,17 @@ export class MissionChat implements OnInit, OnDestroy {
             });
         });
 
-        this.peer.on('error', (err) => {
+        this.peer.on('error', (err: any) => {
             console.warn('PeerJS Error:', err);
-            // Handle specific errors like 'unavailable-id' if needed
+            if (err.type === 'unavailable-id') {
+                console.error('Peer ID is taken. Session might be active in another tab.');
+                alert('Connection Error: You are already connected in another tab or session is stuck. Please close other tabs and try again later.');
+            } else if (err.type === 'peer-unavailable') {
+                console.log('Peer not found (might be offline).');
+            } else if (err.type === 'network' || err.type === 'disconnected') {
+                console.error('Network error. Reconnecting in 3s...');
+                setTimeout(() => this.reconnect(), 3000);
+            }
         });
     }
 
@@ -141,14 +158,27 @@ export class MissionChat implements OnInit, OnDestroy {
         this._cdr.markForCheck();
     }
 
+    reconnect() {
+        if (this.peer && !this.peer.destroyed) {
+            this.peer.destroy();
+        }
+        this.remoteStreams.clear(); // Clear old streams
+        this.initAudioAndPeer(); // Restart everything
+    }
+
     createAudioElement(peerId: string, stream: MediaStream) {
         const audio = document.createElement('audio');
         audio.srcObject = stream;
         audio.id = `audio-${peerId}`;
         audio.autoplay = true;
-        // audio.controls = true; // Debug only
-        audio.style.display = 'none'; // Hidden
+        audio.style.display = 'none';
         document.body.appendChild(audio);
+
+        // Handle Autoplay Policy
+        audio.play().catch(e => {
+            console.warn('Autoplay blocked for peer:', peerId, e);
+            // Optionally show a "Play" button UI to user here if needed
+        });
     }
 
     startAudioAnalysis() {
