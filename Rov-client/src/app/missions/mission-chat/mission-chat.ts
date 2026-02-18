@@ -31,7 +31,7 @@ export class MissionChat implements OnInit, OnDestroy {
     isMuted: boolean = false;
     isDeafened: boolean = false;
     isTalking: boolean = false;
-    isAudioStarted: boolean = false; 
+    isAudioStarted: boolean = false;
 
     private audioContext: AudioContext | undefined;
     private analyser: AnalyserNode | undefined;
@@ -41,7 +41,7 @@ export class MissionChat implements OnInit, OnDestroy {
 
     private peer: Peer | undefined;
     private myStream: MediaStream | undefined;
-    remoteStreams: Map<string, MediaStream> = new Map(); 
+    remoteStreams: Map<string, MediaStream> = new Map();
 
     ngOnInit() {
         this._route.params.subscribe(params => {
@@ -96,7 +96,7 @@ export class MissionChat implements OnInit, OnDestroy {
                     { urls: 'stun:global.stun.twilio.com:3478' }
                 ]
             },
-            debug: 2 
+            debug: 2
         });
 
         this.peer.on('open', (id) => {
@@ -220,13 +220,61 @@ export class MissionChat implements OnInit, OnDestroy {
 
     private updateMembers(newMembers: Brawler[]) {
         const myUserId = this.passport()?.user?.id;
-        const newJoiners = newMembers.filter(nm => 
-            nm.id !== myUserId && !this.members.some(m => m.id === nm.id)
+
+        // 1. Check if members actually changed to prevent UI flickering
+        const currentIds = this.members.map(m => m.id).sort().join(',');
+        const newIds = newMembers.map(m => m.id).sort().join(',');
+
+        if (currentIds === newIds && this.members.length === newMembers.length) {
+            // Data is same, do not replace reference
+            return;
+        }
+
+        // Find NEW members who weren't in our list before
+        const newJoiners = newMembers.filter(nm =>
+            nm.id !== myUserId &&
+            !this.members.some(m => m.id === nm.id)
         );
+
         this.members = newMembers;
         this.memberCount = this.members.length;
-        if (this.peer && newJoiners.length > 0) this.callMembers(newJoiners);
+
+        // If we already have PeerJS setup, call the new joiners
+        if (this.peer && newJoiners.length > 0) {
+            console.log(`Found ${newJoiners.length} new joiners, initiating calls...`);
+            this.callMembers(newJoiners);
+        }
+
         this._cdr.markForCheck();
+    }
+
+    trackById(index: number, item: Brawler): number {
+        return item.id;
+    }
+
+    getMemberStatus(memberId: number): string {
+        const myUserId = this.passport()?.user?.id;
+        if (memberId === myUserId) return 'Connected';
+
+        // We can check if we have a stream for this user
+        // But peerId includes random suffix now, so we need to fuzzy match or just trust the member list + peer connection event
+        // Ideally we map memberId to peerIds, but for now let's check if we have ANY stream that contains the user ID in its label/peerId?
+        // Actually, we store remoteStreams by peerId.
+
+        let isConnected = false;
+
+        // Check if any connected peer ID contains the user ID
+        // PeerID format: rov-mission-{id}-user-{userId}-{random}
+        const pattern = `user-${memberId}-`;
+
+        for (const peerId of this.remoteStreams.keys()) {
+            if (peerId.includes(pattern)) {
+                isConnected = true;
+                break;
+            }
+        }
+
+        return isConnected ? 'Connected' : 'Connecting...';
     }
 
     private callMembers(targets: Brawler[]) {
