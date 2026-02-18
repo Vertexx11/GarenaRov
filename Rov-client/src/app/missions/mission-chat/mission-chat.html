@@ -68,11 +68,33 @@
 
 <!-- Voice Controls (visible when connected) -->
 <div class="voice-controls" *ngIf="connectionStatus === 'connected'">
-    <button (click)="toggleMic()" [class.active]="!isMuted">
-        {{ isMuted ? 'Unmute' : 'Mute' }}
-    </button>
-    <button (click)="toggleDeafen()" [class.active]="isDeafened">
-        {{ isDeafened ? 'Undeafen' : 'Deafen' }}
-    </button>
-    <button (click)="disconnect()" class="btn-exit">Leave Mission</button>
+
+    <!-- User Info (Bottom Left) -->
+    <div class="user-info">
+        <div class="avatar-small">
+            <img [src]="passport()?.user?.avatar_url || 'assets/default-avatar.png'" alt="User"
+                class="avatar-img-small">
+        </div>
+        <div class="user-details">
+            <div class="name">{{ passport()?.user?.display_name }}</div>
+            <div class="status">#{{ passport()?.user?.username || passport()?.user?.id }}</div>
+        </div>
+    </div>
+
+    <!-- Action Buttons (Bottom Right) -->
+    <div class="control-buttons">
+        <button class="control-btn" [class.muted-active]="isMuted" (click)="toggleMic()"
+            [title]="isMuted ? 'Unmute' : 'Mute'">
+            <i class="fa-solid" [class.fa-microphone-slash]="isMuted" [class.fa-microphone]="!isMuted"></i>
+        </button>
+
+        <button class="control-btn" [class.muted-active]="isDeafened" (click)="toggleDeafen()"
+            [title]="isDeafened ? 'Undeafen' : 'Deafen'">
+            <i class="fa-solid" [class.fa-headset]="!isDeafened" [class.fa-ban]="isDeafened"></i>
+        </button>
+
+        <button class="disconnect-btn" (click)="disconnect()" title="Disconnect">
+            <i class="fa-solid fa-phone-slash"></i>
+        </button>
+    </div>
 </div>
