@@ -2,6 +2,17 @@
   "version": 2,
   "public": true,
   "name": "avengers-assembleclient",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "upgrade-insecure-requests"
+        }
+      ]
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
