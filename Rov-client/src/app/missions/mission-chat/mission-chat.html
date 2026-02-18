@@ -1,27 +1,78 @@
-<div class="mission-chat-container">
-    <div class="participants-list">
-        <div *ngFor="let member of members; trackBy: trackById" class="participant-card">
-            <div class="participant-avatar">
-                <img [src]="member.avatar_url || 'assets/default-avatar.png'" alt="avatar">
+<div class="header">
+    <h1>{{ mission?.name || 'Voice Channel' }}</h1>
+    <div class="channel-status">
+        <span class="status-dot" [style.background]="connectionStatus === 'connected' ? '#4ade80' : '#d1d5db'"></span>
+        {{ connectionStatus === 'connected' ? 'Voice Connected' : 'Not Connected' }}
+    </div>
+</div>
+
+<!-- Join Screen -->
+<div class="join-screen" *ngIf="connectionStatus === 'idle' || connectionStatus === 'error'">
+    <div class="join-card">
+        <div class="icon-circle">
+            <i class="fa-solid fa-headset"></i>
+        </div>
+        <h2>Ready to join?</h2>
+        <p>Connect to voice channel to talk with your team.</p>
+
+        <p class="error-msg" *ngIf="errorMessage">
+            <i class="fa-solid fa-circle-exclamation"></i> {{ errorMessage }}
+        </p>
+
+        <button class="join-btn-large" (click)="joinVoiceChannel()">
+            Join Voice Channel
+        </button>
+    </div>
+</div>
+
+<!-- Loading Screen -->
+<div class="loading-screen" *ngIf="connectionStatus === 'connecting'">
+    <div class="spinner"></div>
+    <p>Connecting to voice server...</p>
+</div>
+
+<!-- Connected Grid -->
+<div class="voice-grid" *ngIf="connectionStatus === 'connected'">
+    <!-- Self User Card -->
+    <div class="voice-card" [class.talking]="isTalking && !isMuted">
+        <div class="avatar-wrapper">
+            <div class="avatar-large">
+                <img [src]="passport()?.user?.avatar_url || 'assets/default-avatar.png'" alt="My Avatar"
+                    class="avatar-img">
             </div>
-            
-            <div class="participant-name">{{ member.display_name }}</div>
-            
-            <div class="participant-status">
-                <span [class.online]="getMemberStatus(member.id) === 'Connected'">
-                    {{ getMemberStatus(member.id) }}
-                </span>
+            <!-- Status Indicators -->
+            <div class="status-indicator muted" *ngIf="isMuted">
+                <i class="fa-solid fa-microphone-slash"></i>
             </div>
         </div>
+
+        <span class="participant-name">{{ passport()?.user?.display_name || 'Me' }}</span>
+        <span class="connection-status">Connected</span>
     </div>
 
-    <div class="voice-controls">
-        <button (click)="toggleMic()" [class.active]="!isMuted">
-            {{ isMuted ? 'Unmute' : 'Mute' }}
-        </button>
-        <button (click)="toggleDeafen()" [class.active]="isDeafened">
-            {{ isDeafened ? 'Undeafen' : 'Deafen' }}
-        </button>
-        <button (click)="disconnect()" class="btn-exit">Leave Mission</button>
-    </div>
+    <!-- Other Members -->
+    <ng-container *ngFor="let member of members; trackBy: trackById">
+        <div class="voice-card" [class.talking]="false"> <!-- Ideally we would detect their talking state too -->
+            <div class="avatar-wrapper">
+                <div class="avatar-large">
+                    <img [src]="member.avatar_url || 'assets/default-avatar.png'" [alt]="member.display_name"
+                        class="avatar-img">
+                </div>
+            </div>
+
+            <span class="participant-name">{{ member.display_name }}</span>
+            <span class="connection-status">{{ getMemberStatus(member.id) }}</span>
+        </div>
+    </ng-container>
+</div>
+
+<!-- Voice Controls (visible when connected) -->
+<div class="voice-controls" *ngIf="connectionStatus === 'connected'">
+    <button (click)="toggleMic()" [class.active]="!isMuted">
+        {{ isMuted ? 'Unmute' : 'Mute' }}
+    </button>
+    <button (click)="toggleDeafen()" [class.active]="isDeafened">
+        {{ isDeafened ? 'Undeafen' : 'Deafen' }}
+    </button>
+    <button (click)="disconnect()" class="btn-exit">Leave Mission</button>
 </div>

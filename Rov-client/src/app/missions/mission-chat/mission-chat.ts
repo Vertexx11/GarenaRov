@@ -1,282 +1,319 @@
-import { Component, inject, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MissionService } from '../../_services/mission-service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Mission } from '../../_models/mission';
-import { PassportService } from '../../_services/passport-service';
-import { BrawlerProfile } from '../../_models/brawler';
-import Peer from 'peerjs';
+    import { Component, inject, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+    import { CommonModule } from '@angular/common';
+    import { FormsModule } from '@angular/forms';
+    import { MissionService } from '../../_services/mission-service';
+    import { ActivatedRoute, Router } from '@angular/router';
+    import { Mission } from '../../_models/mission';
+    import { PassportService } from '../../_services/passport-service';
+    import { BrawlerProfile } from '../../_models/brawler';
+    import Peer from 'peerjs';
 
-@Component({
-    selector: 'app-mission-chat',
-    standalone: true,
-    imports: [CommonModule, FormsModule],
-    templateUrl: './mission-chat.html',
-    styleUrl: './mission-chat.css',
-    changeDetection: ChangeDetectionStrategy.OnPush
-})
-export class MissionChat implements OnInit, OnDestroy {
-    private _missionService = inject(MissionService);
-    private _route = inject(ActivatedRoute);
-    readonly passport = inject(PassportService).data;
-    private _cdr = inject(ChangeDetectorRef);
-    private _router = inject(Router);
+    @Component({
+        selector: 'app-mission-chat',
+        standalone: true,
+        imports: [CommonModule, FormsModule],
+        templateUrl: './mission-chat.html',
+        styleUrl: './mission-chat.css',
+        changeDetection: ChangeDetectionStrategy.OnPush
+    })
+    export class MissionChat implements OnInit, OnDestroy {
+        private _missionService = inject(MissionService);
+        private _route = inject(ActivatedRoute);
+        readonly passport = inject(PassportService).data;
+        private _cdr = inject(ChangeDetectorRef);
+        private _router = inject(Router);
 
-    missionId!: number;
-    mission: Mission | undefined;
-    members: BrawlerProfile[] = [];
-    memberCount: number = 0;
+        missionId!: number;
+        mission: Mission | undefined;
+        members: BrawlerProfile[] = [];
 
-    // Voice States
-    isMuted: boolean = false;
-    isDeafened: boolean = false;
-    isTalking: boolean = false;
-    isAudioStarted: boolean = false;
+        // System Status
+        connectionStatus: 'idle' | 'connecting' | 'connected' | 'error' = 'idle';
+        errorMessage: string = '';
 
-    private audioContext: AudioContext | undefined;
-    private analyser: AnalyserNode | undefined;
-    private microphone: MediaStreamAudioSourceNode | undefined;
-    private dataArray: Uint8Array | undefined;
-    private updateInterval: any;
+        // Voice States
+        isMuted: boolean = false;
+        isDeafened: boolean = false; // System deafen (mute incoming)
+        isTalking: boolean = false;
 
-    // WebRTC / PeerJS
-    private peer: Peer | undefined;
-    private myStream: MediaStream | undefined;
-    remoteStreams: Map<string, MediaStream> = new Map();
+        // Audio Analysis (Visualizer)
+        private audioContext: AudioContext | undefined;
+        private analyser: AnalyserNode | undefined;
+        private microphone: MediaStreamAudioSourceNode | undefined;
+        private dataArray: Uint8Array | undefined;
+        private updateInterval: any;
 
-    ngOnInit() {
-        this._route.params.subscribe(params => {
-            this.missionId = +params['id'];
-            if (this.missionId) {
-                this.loadMission();
-            }
-        });
-    }
+        // WebRTC / PeerJS
+        private peer: Peer | undefined;
+        private myStream: MediaStream | undefined;
+        private pollInterval: any;
 
-    async initAudioAndPeer() {
-        if (this.peer) {
-            this.peer.destroy();
-            this.peer = undefined;
-        }
+        remoteStreams: Map<string, MediaStream> = new Map();
 
-        try {
-            this.myStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            this.setupAudioAnalysis(this.myStream);
-            this.setupPeerConnection();
-            this.isAudioStarted = true;
-            this._cdr.markForCheck();
-        } catch (err) {
-            console.error('Error accessing microphone:', err);
-            alert('ไม่สามารถเข้าถึงไมโครโฟนได้ ระบบเสียงจะถูกปิดใช้งาน');
-        }
-    }
-
-    setupAudioAnalysis(stream: MediaStream) {
-        this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-        this.analyser = this.audioContext.createAnalyser();
-        this.microphone = this.audioContext.createMediaStreamSource(stream);
-        this.microphone.connect(this.analyser);
-        this.analyser.fftSize = 256;
-        this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-        this.startAudioAnalysis();
-    }
-
-    setupPeerConnection() {
-        const myUserId = this.passport()?.user?.id;
-        if (!myUserId || !this.missionId) return;
-
-        const randomId = Math.random().toString(36).substring(7);
-        const myPeerId = `rov-mission-${this.missionId}-user-${myUserId}-${randomId}`;
-
-        console.log('Initializing Peer with ID:', myPeerId);
-
-        this.peer = new Peer(myPeerId, {
-            config: {
-                iceServers: [
-                    { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:global.stun.twilio.com:3478' }
-                ]
-            },
-            debug: 2
-        });
-
-        this.peer.on('open', (id) => {
-            console.log('Connected to PeerServer with ID: ' + id);
-            this.connectToMissionMembers();
-        });
-
-        this.peer.on('call', (call) => {
-            console.log('Incoming call from:', call.peer);
-            call.answer(this.myStream);
-            call.on('stream', (remoteStream) => {
-                this.handleRemoteStream(call.peer, remoteStream);
+        ngOnInit() {
+            this._route.params.subscribe(params => {
+                this.missionId = +params['id'];
+                if (this.missionId) {
+                    this.loadMissionData();
+                    this.startMemberPolling();
+                }
             });
-        });
-
-        this.peer.on('error', (err: any) => {
-            console.warn('PeerJS Error:', err.type, err);
-            if (err.type === 'unavailable-id') {
-                setTimeout(() => this.reconnect(), 2000);
-            } else if (err.type === 'network' || err.type === 'disconnected') {
-                this.reconnect();
-            }
-        });
-    }
-
-    connectToMissionMembers() {
-        console.log('Connecting to existing members...');
-        this.callMembers(this.members);
-    }
-
-    handleRemoteStream(peerId: string, stream: MediaStream) {
-        if (this.remoteStreams.has(peerId)) return;
-        this.remoteStreams.set(peerId, stream);
-
-        if (this.isDeafened) {
-            stream.getAudioTracks().forEach(track => track.enabled = false);
         }
 
-        this.createAudioElement(peerId, stream);
-        this._cdr.markForCheck();
-    }
-
-    reconnect() {
-        console.log('Attempting to reconnect...');
-        this.stopAudioAnalysis();
-        setTimeout(() => this.initAudioAndPeer(), 1000);
-    }
-
-    createAudioElement(peerId: string, stream: MediaStream) {
-        const oldEl = document.getElementById(`audio-${peerId}`);
-        if (oldEl) oldEl.remove();
-
-        const audio = document.createElement('audio');
-        audio.srcObject = stream;
-        audio.id = `audio-${peerId}`;
-        audio.autoplay = true;
-        audio.style.display = 'none';
-        document.body.appendChild(audio);
-
-        audio.play().catch(async () => {
-            console.warn('Autoplay blocked. Waiting for user interaction.');
-            if (this.audioContext) await this.audioContext.resume();
-        });
-    }
-
-    startAudioAnalysis() {
-        if (!this.analyser || !this.dataArray) return;
-        this.updateInterval = setInterval(() => {
-            if (this.isMuted) {
-                if (this.isTalking) { this.isTalking = false; this._cdr.markForCheck(); }
-                return;
-            }
-            this.analyser!.getByteFrequencyData(this.dataArray as any);
-            let sum = 0;
-            for (let i = 0; i < this.dataArray!.length; i++) sum += this.dataArray![i];
-            const average = sum / this.dataArray!.length;
-            const wasTalking = this.isTalking;
-            this.isTalking = average > 15;
-            if (wasTalking !== this.isTalking) this._cdr.markForCheck();
-        }, 100);
-    }
-
-    stopAudioAnalysis() {
-        if (this.updateInterval) clearInterval(this.updateInterval);
-        if (this.pollInterval) clearInterval(this.pollInterval);
-        if (this.audioContext) this.audioContext.close();
-        if (this.peer) { this.peer.destroy(); this.peer = undefined; }
-        this.remoteStreams.forEach((_, peerId) => {
-            const el = document.getElementById(`audio-${peerId}`);
-            if (el) el.remove();
-        });
-        this.remoteStreams.clear();
-        if (this.myStream) this.myStream.getTracks().forEach(track => track.stop());
-    }
-
-    ngOnDestroy() { this.stopAudioAnalysis(); }
-
-    private pollInterval: any;
-    async loadMission() {
-        try {
-            this.mission = await this._missionService.getOne(this.missionId);
-            const initialMembers = await this._missionService.getMembers(this.missionId);
-            this.updateMembers(initialMembers);
-            if (!this.peer) await this.initAudioAndPeer();
-            this.startPolling();
-            this._cdr.markForCheck();
-        } catch (e) { console.error('Error loading mission', e); }
-    }
-
-    private startPolling() {
-        if (this.pollInterval) clearInterval(this.pollInterval);
-        this.pollInterval = setInterval(async () => {
+        async loadMissionData() {
             try {
-                const refreshedMembers = await this._missionService.getMembers(this.missionId);
-                this.updateMembers(refreshedMembers);
-            } catch (e) { console.warn('Polling failed', e); }
-        }, 5000);
-    }
+                this.mission = await this._missionService.getOne(this.missionId);
+                const initialMembers = await this._missionService.getMembers(this.missionId);
+                this.members = initialMembers;
+                this._cdr.markForCheck();
+            } catch (e) { console.error('Load mission error', e); }
+        }
 
-    private updateMembers(newMembers: BrawlerProfile[]) {
-        const myUserId = this.passport()?.user?.id;
-        const currentIds = this.members.map(m => m.id).sort().join(',');
-        const newIds = newMembers.map(m => m.id).sort().join(',');
+        async joinVoiceChannel() {
+            if (this.connectionStatus === 'connected' || this.connectionStatus === 'connecting') return;
 
-        if (currentIds === newIds && this.members.length === newMembers.length) return;
+            this.connectionStatus = 'connecting';
+            this.errorMessage = '';
+            this._cdr.markForCheck();
 
-        const newJoiners = newMembers.filter(nm =>
-            nm.id !== myUserId && !this.members.some(m => m.id === nm.id)
-        );
+            try {
+                // 1. Get Microphone
+                this.myStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-        this.members = newMembers;
-        this.memberCount = this.members.length;
-        if (this.peer && newJoiners.length > 0) this.callMembers(newJoiners);
-        this._cdr.markForCheck();
-    }
+                // 2. Setup Audio Analysis (for visualizer)
+                this.setupAudioAnalysis(this.myStream);
 
-    trackById(index: number, item: BrawlerProfile): number {
-        return item.id;
-    }
-
-    getMemberStatus(memberId: number): string {
-        const myUserId = this.passport()?.user?.id;
-        if (memberId === myUserId) return 'Connected';
-
-        let isConnected = false;
-        const pattern = `user-${memberId}-`;
-
-        for (const peerId of this.remoteStreams.keys()) {
-            if (peerId.includes(pattern)) {
-                isConnected = true;
-                break;
+                // 3. Init PeerJS
+                this.setupPeerConnection();
+            } catch (err) {
+                console.error('Mic Error:', err);
+                this.connectionStatus = 'error';
+                this.errorMessage = 'ไม่สามารถเข้าถึงไมโครโฟนได้ (กรุณากด Allow permission)';
+                this._cdr.markForCheck();
             }
         }
-        return isConnected ? 'Connected' : 'Connecting...';
-    }
 
-    private callMembers(targets: BrawlerProfile[]) {
-        if (!this.peer || !this.myStream) return;
-        targets.forEach(member => {
-            const peerIdToCall = `rov-mission-${this.missionId}-user-${member.id}`;
-            const call = this.peer!.call(peerIdToCall, this.myStream!);
-            if (call) {
-                call.on('stream', (stream) => this.handleRemoteStream(peerIdToCall, stream));
+        setupAudioAnalysis(stream: MediaStream) {
+            try {
+                this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+                this.analyser = this.audioContext.createAnalyser();
+                this.microphone = this.audioContext.createMediaStreamSource(stream);
+                this.microphone.connect(this.analyser);
+                this.analyser.fftSize = 256;
+                this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+
+                // Start checking volume levels
+                this.updateInterval = setInterval(() => {
+                    if (this.isMuted) {
+                        if (this.isTalking) { this.isTalking = false; this._cdr.markForCheck(); }
+                        return;
+                    }
+                    if (this.analyser && this.dataArray) {
+                        this.analyser.getByteFrequencyData(this.dataArray);
+                        let sum = 0;
+                        for (let i = 0; i < this.dataArray.length; i++) sum += this.dataArray[i];
+                        const average = sum / this.dataArray.length;
+                        const wasTalking = this.isTalking;
+                        this.isTalking = average > 15; // Threshold
+                        if (wasTalking !== this.isTalking) this._cdr.markForCheck();
+                    }
+                }, 100);
+            } catch (e) {
+                console.error('Audio Context Error', e);
             }
-        });
-    }
+        }
 
-    toggleMic() {
-        this.isMuted = !this.isMuted;
-        if (this.myStream) this.myStream.getAudioTracks().forEach(t => t.enabled = !this.isMuted);
-        this._cdr.markForCheck();
-    }
+        setupPeerConnection() {
+            const myUserId = this.passport()?.user?.id;
 
-    toggleDeafen() {
-        this.isDeafened = !this.isDeafened;
-        this.remoteStreams.forEach(s => s.getAudioTracks().forEach(t => t.enabled = !this.isDeafened));
-        this._cdr.markForCheck();
-    }
+            // Use DETERMINISTIC ID so others can find us
+            const peerId = `rov-mission-${this.missionId}-user-${myUserId}`;
 
-    disconnect() { this._router.navigate(['/missions']); }
-}
+            console.log('Connecting to PeerServer as:', peerId);
+
+            this.peer = new Peer(peerId, {
+                config: {
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:global.stun.twilio.com:3478' }
+                    ]
+                },
+                debug: 1
+            });
+
+            this.peer.on('open', (id) => {
+                console.log('Peer Open:', id);
+                this.connectionStatus = 'connected';
+                this.connectToAllMembers();
+                this._cdr.markForCheck();
+            });
+
+            this.peer.on('call', (call) => {
+                console.log('Receiving call from', call.peer);
+                call.answer(this.myStream);
+                call.on('stream', (remoteStream) => this.handleRemoteStream(call.peer, remoteStream));
+            });
+
+            this.peer.on('error', (err: any) => {
+                console.error('Peer Error:', err);
+                if (err.type === 'unavailable-id') {
+                    this.connectionStatus = 'error';
+                    this.errorMessage = 'ID ถูกใช้งานอยู่ (Ghost Session) กรุณารอสักครู่แล้วลองใหม่';
+                } else if (this.connectionStatus !== 'connected') {
+                    this.connectionStatus = 'error';
+                    this.errorMessage = 'การเชื่อมต่อล้มเหลว';
+                }
+                this._cdr.markForCheck();
+            });
+        }
+
+        connectToAllMembers() {
+            if (!this.peer || !this.myStream) return;
+            const myUserId = this.passport()?.user?.id;
+
+            this.members.forEach(m => {
+                if (m.id === myUserId) return;
+
+                const targetPeerId = `rov-mission-${this.missionId}-user-${m.id}`;
+                console.log('Calling:', targetPeerId);
+
+                const call = this.peer!.call(targetPeerId, this.myStream!);
+                if (call) {
+                    call.on('stream', (remoteStream) => this.handleRemoteStream(targetPeerId, remoteStream));
+                    call.on('error', (e) => console.log('Call error to ' + targetPeerId, e));
+                }
+            });
+        }
+
+        handleRemoteStream(peerId: string, stream: MediaStream) {
+            if (this.remoteStreams.has(peerId)) return;
+
+            console.log('Got remote stream from:', peerId);
+            this.remoteStreams.set(peerId, stream);
+
+            this.createAudioElement(peerId, stream);
+            this._cdr.markForCheck();
+        }
+
+        createAudioElement(peerId: string, stream: MediaStream) {
+            const existing = document.getElementById(`audio-${peerId}`);
+            if (existing) existing.remove();
+
+            const audio = document.createElement('audio');
+            audio.srcObject = stream;
+            audio.id = `audio-${peerId}`;
+            audio.autoplay = true;
+            (audio as any).playsInline = true;
+            document.body.appendChild(audio);
+
+            // Handle Autoplay Policy
+            audio.play().catch(async () => {
+                console.warn('Autoplay blocked');
+                // User interactions usually unlock this, but we are already inside a 'click' derived flow (joinVoiceChannel)
+            });
+        }
+
+        startMemberPolling() {
+            if (this.pollInterval) clearInterval(this.pollInterval);
+            this.pollInterval = setInterval(async () => {
+                try {
+                    const latestMembers = await this._missionService.getMembers(this.missionId);
+
+                    // Diff members to find new joiners
+                    const oldIds = this.members.map(m => m.id);
+                    const newJoiners = latestMembers.filter(m => !oldIds.includes(m.id));
+
+                    this.members = latestMembers;
+                    this._cdr.markForCheck();
+
+                    // If we are connected and someone new joined, call them
+                    if (this.connectionStatus === 'connected' && newJoiners.length > 0) {
+                        const myUserId = this.passport()?.user?.id;
+                        if (!this.peer || !this.myStream) return;
+
+                        newJoiners.forEach(m => {
+                            if (m.id === myUserId) return;
+                            const targetPeerId = `rov-mission-${this.missionId}-user-${m.id}`;
+                            console.log('New member joined, calling:', targetPeerId);
+                            const call = this.peer!.call(targetPeerId, this.myStream!);
+                            if (call) {
+                                call.on('stream', (rs) => this.handleRemoteStream(targetPeerId, rs));
+                            }
+                        });
+                    }
+                } catch (e) { }
+            }, 5000);
+        }
+
+        disconnect() {
+            this.leaveVoice();
+            this._router.navigate(['/missions']);
+        }
+
+        leaveVoice() {
+            if (this.peer) {
+                this.peer.destroy();
+                this.peer = undefined;
+            }
+
+            // Stop Analysis
+            if (this.updateInterval) clearInterval(this.updateInterval);
+            if (this.audioContext) this.audioContext.close();
+
+            // Stop Streams
+            this.remoteStreams.forEach(stream => {
+                stream.getTracks().forEach(t => t.stop());
+            });
+
+            // Remove Audio Elements
+            this.remoteStreams.forEach((_, key) => {
+                const el = document.getElementById(`audio-${key}`);
+                if (el) el.remove();
+            });
+            this.remoteStreams.clear();
+
+            if (this.myStream) {
+                this.myStream.getTracks().forEach(t => t.stop());
+                this.myStream = undefined;
+            }
+
+            this.connectionStatus = 'idle';
+            this._cdr.markForCheck();
+        }
+
+        toggleMic() {
+            this.isMuted = !this.isMuted;
+            if (this.myStream) {
+                this.myStream.getAudioTracks().forEach(t => t.enabled = !this.isMuted);
+            }
+            this._cdr.markForCheck();
+        }
+
+        toggleDeafen() {
+            this.isDeafened = !this.isDeafened;
+            this.remoteStreams.forEach(s => {
+                s.getAudioTracks().forEach(t => t.enabled = !this.isDeafened);
+            });
+            this._cdr.markForCheck();
+        }
+
+        ngOnDestroy() {
+            this.leaveVoice();
+            if (this.pollInterval) clearInterval(this.pollInterval);
+        }
+
+        // Helpers
+        // Status Logic: Check if we have a stream for them
+        getMemberStatus(memberId: number): string {
+            const myUserId = this.passport()?.user?.id;
+            if (memberId === myUserId) {
+                return this.connectionStatus === 'connected' ? 'Connected' : 'Offline';
+            }
+
+            // Check map
+            const targetPeerId = `rov-mission-${this.missionId}-user-${memberId}`;
+            return this.remoteStreams.has(targetPeerId) ? 'Connected' : 'Offline'; // Simple check
+        }
+
+        trackById(index: number, item: BrawlerProfile) { return item.id; }
+    }

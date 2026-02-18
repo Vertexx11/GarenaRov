@@ -1,5 +1,5 @@
 /* Discord-Inspired Mission Chat */
-@import url('https://fonts.googleapis.com/css2?family=gg+sans:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 /* Mocking Discord font */
 
 .chat-container {
@@ -13,7 +13,7 @@
     background-color: #36393f;
     /* Discord Background */
     color: #dcddde;
-    font-family: 'gg sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     overflow: hidden;
     height: calc(100vh - 84px);
 }
