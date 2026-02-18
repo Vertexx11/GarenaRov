@@ -4,7 +4,8 @@ import { DatePipe, NgClass } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { CommonModule, DecimalPipe, isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID } from '@angular/core';
 import { AddMission } from '../../_models/add-mission';
 import { NewMission } from '../../_dialog/new-mission/new-mission';
 import { Mission } from '../../_models/mission';
@@ -31,6 +32,7 @@ export class MissionManager implements OnInit {
   private _passportService = inject(PassportService);
   private _router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private _platformId = inject(PLATFORM_ID);
 
   missions: Mission[] = [];
 
@@ -107,12 +109,13 @@ export class MissionManager implements OnInit {
   async onLeave(mission: Mission) {
     if (!confirm(`ต้องการออกจากภารกิจ "${mission.name}" ใช่หรือไม่?`)) return;
     try {
+      if (!isPlatformBrowser(this._platformId)) return;
       const key = 'my_joined_missions';
-      let current: number[] = JSON.parse(localStorage.getItem(key) || '[]');
+      let current: number[] = JSON.parse(localStorage.getItem(key) || '[]') as number[];
       current = current.filter(id => id !== mission.id);
       localStorage.setItem(key, JSON.stringify(current));
       this.loadMyMission();
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       alert('ออกจากภารกิจไม่สำเร็จ');
     }
@@ -176,14 +179,18 @@ export class MissionManager implements OnInit {
       // 🌟 Filter out Completed from leading (User preference for active list)
       this.leadingMissions = allMissions.filter((m: any) => m.chief_id == myId && m.status !== 'Completed');
 
-      const joinedIds = JSON.parse(localStorage.getItem('my_joined_missions') || '[]');
+      let joinedIds: number[] = [];
+      if (isPlatformBrowser(this._platformId)) {
+        joinedIds = JSON.parse(localStorage.getItem('my_joined_missions') || '[]') as number[];
+      }
+
       this.joinedMissions = allMissions.filter((m: any) => {
         return m.chief_id != myId && joinedIds.includes(m.id);
       });
 
       this.calculateStats();
       this.cdr.detectChanges();
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error loading missions:', error);
     }
   }

@@ -80,11 +80,13 @@ export class Profile implements OnInit {
         if (passportUser && passportUser.id) {
           myId = passportUser.id;
         } else {
-          const userStr = localStorage.getItem('user');
-          if (userStr) {
-            try {
-              myId = JSON.parse(userStr).id;
-            } catch (e) { }
+          if (isPlatformBrowser(this._platformId)) {
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+              try {
+                myId = JSON.parse(userStr).id;
+              } catch (e) { }
+            }
           }
         }
       } else {

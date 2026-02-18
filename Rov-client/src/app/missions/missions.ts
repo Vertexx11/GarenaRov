@@ -1,4 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -22,6 +23,7 @@ export class Missions implements OnInit {
   private _missionService = inject(MissionService);
   private _passportService = inject(PassportService);
   private _router = inject(Router);
+  private _platformId = inject(PLATFORM_ID);
 
   filter: MissionFilter = {
     status: undefined
@@ -53,7 +55,10 @@ export class Missions implements OnInit {
   async onSubmit() {
     try {
       const results = await this._missionService.gets(this.filter);
-      const joinedIds = JSON.parse(localStorage.getItem('my_joined_missions') || '[]');
+      let joinedIds: number[] = [];
+      if (isPlatformBrowser(this._platformId)) {
+        joinedIds = JSON.parse(localStorage.getItem('my_joined_missions') || '[]');
+      }
 
       this.missions = results.filter(m => {
         const isNotMyOwn = m.chief_id !== this.myUserId;
@@ -67,7 +72,7 @@ export class Missions implements OnInit {
       console.log('Search results:', this.missions);
 
       console.log('Search results (Hidden Joined):', this.missions);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Search error:', error);
     }
   }
@@ -101,8 +106,9 @@ export class Missions implements OnInit {
   }
 
   private saveJoinedToLocal(id: number) {
+    if (!isPlatformBrowser(this._platformId)) return;
     const key = 'my_joined_missions';
-    const current = JSON.parse(localStorage.getItem(key) || '[]');
+    const current = JSON.parse(localStorage.getItem(key) || '[]') as any[];
     if (!current.includes(id)) {
       current.push(id);
       localStorage.setItem(key, JSON.stringify(current));
@@ -110,7 +116,8 @@ export class Missions implements OnInit {
   }
 
   isJoined(id: number): boolean {
-    const joinedIds = JSON.parse(localStorage.getItem('my_joined_missions') || '[]');
+    if (!isPlatformBrowser(this._platformId)) return false;
+    const joinedIds = JSON.parse(localStorage.getItem('my_joined_missions') || '[]') as any[];
     return joinedIds.includes(id);
   }
 
