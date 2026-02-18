@@ -302,6 +302,36 @@
   color: var(--text-main);
 }
 
+/* Action Row and Chat btn */
+.action-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.chat-btn {
+  padding: 6px 12px;
+  border: 1px solid #e0e7ff;
+  background: #eef2ff;
+  color: #4f46e5;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chat-btn:hover {
+  background: #e0e7ff;
+}
+
+.chat-btn .material-icons {
+  font-size: 16px;
+}
+
 .joined-card .card-footer {
   margin-top: auto;
   padding-top: 12px;
@@ -312,7 +342,7 @@
 }
 
 .leave-btn {
-  padding: 4px 12px;
+  padding: 6px 12px;
   border: 1px solid #fee2e2;
   background: white;
   color: #dc2626;

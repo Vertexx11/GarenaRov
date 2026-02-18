@@ -1,4 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MissionService } from '../_services/mission-service';
@@ -20,6 +21,7 @@ import { Brawler } from '../_models/brawler';
 export class Missions implements OnInit {
   private _missionService = inject(MissionService);
   private _passportService = inject(PassportService);
+  private _router = inject(Router);
 
   filter: MissionFilter = {
     status: undefined
@@ -56,11 +58,13 @@ export class Missions implements OnInit {
       this.missions = results.filter(m => {
         const isNotMyOwn = m.chief_id !== this.myUserId;
         const isNotJoined = !joinedIds.includes(m.id);
-        const isCompleted = m.status === 'Completed';
 
-        // Show if it's (Not Mine AND Not Joined) OR (It is Completed)
-        return (isNotMyOwn && isNotJoined) || isCompleted;
+        // Show if it's (Not Mine AND Not Joined)
+        // User requested to HIDE joined missions from this list
+        return isNotMyOwn && isNotJoined;
       });
+
+      console.log('Search results:', this.missions);
 
       console.log('Search results (Hidden Joined):', this.missions);
     } catch (error) {
@@ -93,7 +97,7 @@ export class Missions implements OnInit {
   private handleJoinSuccess(id: number) {
     this.saveJoinedToLocal(id);
     alert('✅ Join Success! เข้าร่วมภารกิจสำเร็จ');
-    this.onSubmit();
+    this._router.navigate(['/missions', id, 'chat']);
   }
 
   private saveJoinedToLocal(id: number) {
@@ -103,6 +107,15 @@ export class Missions implements OnInit {
       current.push(id);
       localStorage.setItem(key, JSON.stringify(current));
     }
+  }
+
+  isJoined(id: number): boolean {
+    const joinedIds = JSON.parse(localStorage.getItem('my_joined_missions') || '[]');
+    return joinedIds.includes(id);
+  }
+
+  openChat(id: number) {
+    this._router.navigate(['/missions', id, 'chat']);
   }
 
   getStatusLabel(status: string): string {

@@ -139,7 +139,5 @@ export class Profile implements OnInit {
     });
   }
 
-  openShop() {
-    this._router.navigate(['/rewards-shop']);
-  }
+
 }

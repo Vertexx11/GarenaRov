@@ -61,19 +61,39 @@ export class MissionService {
     return await firstValueFrom(this._http.delete(url, { responseType: 'text' }));
   }
 
+  async getOne(id: number): Promise<Mission> {
+    const url = `${this._api_url}/view/${id}`;
+    return await firstValueFrom(this._http.get<Mission>(url));
+  }
+
+  async getMemberCount(id: number): Promise<number> {
+    const url = `${this._api_url}/view/count/${id}`;
+    return await firstValueFrom(this._http.get<number>(url));
+  }
+
+  async getChatMessages(missionId: number): Promise<any[]> {
+    const url = `${this._api_url}/chat/${missionId}/messages`;
+    return await firstValueFrom(this._http.get<any[]>(url));
+  }
+
+  async sendChatMessage(missionId: number, content: string): Promise<any> {
+    const url = `${this._api_url}/chat/${missionId}/messages`;
+    return await firstValueFrom(this._http.post<any>(url, { content }));
+  }
+
   // --- Mission Operations (Transitions) ---
   async start(id: number): Promise<any> {
-    const url = `${this._api_url}/mission-operation/in-progress/${id}`;
+    const url = `${this._api_url}/mission/in-progress/${id}`;
     return await firstValueFrom(this._http.patch(url, {}));
   }
 
   async complete(id: number): Promise<any> {
-    const url = `${this._api_url}/mission-operation/to-completed/${id}`;
+    const url = `${this._api_url}/mission/to-completed/${id}`;
     return await firstValueFrom(this._http.patch(url, {}));
   }
 
   async fail(id: number): Promise<any> {
-    const url = `${this._api_url}/mission-operation/to-failed/${id}`;
+    const url = `${this._api_url}/mission/to-failed/${id}`;
     return await firstValueFrom(this._http.patch(url, {}));
   }
 

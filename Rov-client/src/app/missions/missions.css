@@ -284,6 +284,19 @@
   transform: translateY(-1px);
 }
 
+.join-btn.chat-mode {
+  background: #eef2ff;
+  color: #4f46e5;
+  border: 1px solid #e0e7ff;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.join-btn.chat-mode:hover {
+  background: #e0e7ff;
+}
+
 .no-data-state {
   padding: 40px;
   border-radius: 16px;

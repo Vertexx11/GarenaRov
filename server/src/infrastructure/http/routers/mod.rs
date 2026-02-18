@@ -5,3 +5,4 @@ pub mod authentication;
 pub mod mission_operation;
 pub mod mission_viewing;
 pub mod crew_operation;
+pub mod chat;

@@ -55,6 +55,10 @@ fn api_serve(db_pool: Arc<PgPoolSquad>) -> Router {
             "/view",
             routers::mission_viewing::routes(Arc::clone(&db_pool)),
         )
+        .nest(
+            "/chat",
+            routers::chat::routes(Arc::clone(&db_pool)),
+        )
 
         .route("/error/{status_code_u16}", get(routers::default::error))
         .fallback(|| async { (StatusCode::NOT_FOUND, "API not found") })

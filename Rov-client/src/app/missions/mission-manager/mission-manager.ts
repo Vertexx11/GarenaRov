@@ -1,4 +1,5 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { DatePipe, NgClass } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -28,6 +29,7 @@ export class MissionManager implements OnInit {
   private _missionService = inject(MissionService);
   private _dialog = inject(MatDialog);
   private _passportService = inject(PassportService);
+  private _router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 
   missions: Mission[] = [];
@@ -114,6 +116,10 @@ export class MissionManager implements OnInit {
       console.error(error);
       alert('ออกจากภารกิจไม่สำเร็จ');
     }
+  }
+
+  onChat(mission: Mission) {
+    this._router.navigate(['/missions', mission.id, 'chat']);
   }
 
   async onStart(mission: Mission) {

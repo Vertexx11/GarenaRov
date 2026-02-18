@@ -1,7 +1,7 @@
 use crate::config::{config_loader::get_cloundinary_env, config_model::CloudinaryEnv};
 use crate::domain::value_objects::base64_image::Base64Image;
 use crate::domain::value_objects::uploaded_image::UploadedImage;
-use anyhow::{Context, Ok, Result};
+use anyhow::{Ok, Result};
 use chrono::Utc;
 use reqwest::multipart::{Form, Part};
 use sha1::{Digest, Sha1};

@@ -1,7 +1,7 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 
-use crate::domain::entities::missions::{AddMissionEntity, EditMissionEntity, MissionEntity};
+use crate::domain::entities::missions::{AddMissionEntity, EditMissionEntity};
 use crate::domain::value_objects::mission_statuses::MissionStatuses;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
