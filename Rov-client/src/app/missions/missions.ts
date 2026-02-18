@@ -7,7 +7,7 @@ import { MissionService } from '../_services/mission-service';
 import { PassportService } from '../_services/passport-service';
 import { MissionFilter } from '../_models/mission-filter';
 import { Mission } from '../_models/mission';
-import { Brawler } from '../_models/brawler';
+import { BrawlerProfile } from '../_models/brawler';
 
 @Component({
   selector: 'app-missions',
@@ -30,7 +30,7 @@ export class Missions implements OnInit {
   };
 
   missions: Mission[] = [];
-  topBrawlers: Brawler[] = [];
+  topBrawlers: BrawlerProfile[] = [];
 
   constructor() { }
 
@@ -41,7 +41,7 @@ export class Missions implements OnInit {
   async loadLeaderboard() {
     try {
       const data = await this._missionService.getLeaderboard();
-      this.topBrawlers = data.sort((a: Brawler, b: Brawler) => b.total_points - a.total_points);
+      this.topBrawlers = data.sort((a: BrawlerProfile, b: BrawlerProfile) => b.total_points - a.total_points);
     } catch (error) {
       console.error('Leaderboard error:', error);
     }

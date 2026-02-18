@@ -1,4 +1,4 @@
-export interface Brawler {
+export interface BrawlerProfile {
     id: number;
     username: string;
     display_name: string;

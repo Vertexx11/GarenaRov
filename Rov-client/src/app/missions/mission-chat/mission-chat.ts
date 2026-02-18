@@ -5,7 +5,7 @@ import { MissionService } from '../../_services/mission-service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Mission } from '../../_models/mission';
 import { PassportService } from '../../_services/passport-service';
-import { Brawler } from '../../_models/brawler';
+import { BrawlerProfile } from '../../_models/brawler';
 import Peer from 'peerjs';
 
 @Component({
@@ -25,7 +25,7 @@ export class MissionChat implements OnInit, OnDestroy {
 
     missionId!: number;
     mission: Mission | undefined;
-    members: Brawler[] = [];
+    members: BrawlerProfile[] = [];
     memberCount: number = 0;
 
     // Voice States
@@ -34,7 +34,6 @@ export class MissionChat implements OnInit, OnDestroy {
     isTalking: boolean = false;
     isAudioStarted: boolean = false;
 
-    // Audio Context (Visualization)
     private audioContext: AudioContext | undefined;
     private analyser: AnalyserNode | undefined;
     private microphone: MediaStreamAudioSourceNode | undefined;
@@ -44,7 +43,7 @@ export class MissionChat implements OnInit, OnDestroy {
     // WebRTC / PeerJS
     private peer: Peer | undefined;
     private myStream: MediaStream | undefined;
-    remoteStreams: Map<string, MediaStream> = new Map(); // peerId -> Stream
+    remoteStreams: Map<string, MediaStream> = new Map();
 
     ngOnInit() {
         this._route.params.subscribe(params => {
@@ -62,15 +61,9 @@ export class MissionChat implements OnInit, OnDestroy {
         }
 
         try {
-            // 1. Get User Media
             this.myStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-            // 2. Setup Visualization
             this.setupAudioAnalysis(this.myStream);
-
-            // 3. Setup PeerJS
             this.setupPeerConnection();
-
             this.isAudioStarted = true;
             this._cdr.markForCheck();
         } catch (err) {
@@ -93,7 +86,6 @@ export class MissionChat implements OnInit, OnDestroy {
         const myUserId = this.passport()?.user?.id;
         if (!myUserId || !this.missionId) return;
 
-        // แก้ไข: ใช้ ID แบบมี Suffix เพื่อป้องกัน Ghost Session
         const randomId = Math.random().toString(36).substring(7);
         const myPeerId = `rov-mission-${this.missionId}-user-${myUserId}-${randomId}`;
 
@@ -111,7 +103,7 @@ export class MissionChat implements OnInit, OnDestroy {
 
         this.peer.on('open', (id) => {
             console.log('Connected to PeerServer with ID: ' + id);
-            this.connectToMissionMembers(); 
+            this.connectToMissionMembers();
         });
 
         this.peer.on('call', (call) => {
@@ -167,7 +159,7 @@ export class MissionChat implements OnInit, OnDestroy {
         document.body.appendChild(audio);
 
         audio.play().catch(async () => {
-            console.warn('Autoplay blocked. User needs to interact with the page first.');
+            console.warn('Autoplay blocked. Waiting for user interaction.');
             if (this.audioContext) await this.audioContext.resume();
         });
     }
@@ -226,7 +218,7 @@ export class MissionChat implements OnInit, OnDestroy {
         }, 5000);
     }
 
-    private updateMembers(newMembers: Brawler[]) {
+    private updateMembers(newMembers: BrawlerProfile[]) {
         const myUserId = this.passport()?.user?.id;
         const currentIds = this.members.map(m => m.id).sort().join(',');
         const newIds = newMembers.map(m => m.id).sort().join(',');
@@ -239,14 +231,11 @@ export class MissionChat implements OnInit, OnDestroy {
 
         this.members = newMembers;
         this.memberCount = this.members.length;
-
-        if (this.peer && newJoiners.length > 0) {
-            this.callMembers(newJoiners);
-        }
+        if (this.peer && newJoiners.length > 0) this.callMembers(newJoiners);
         this._cdr.markForCheck();
     }
 
-    trackById(index: number, item: Brawler): number {
+    trackById(index: number, item: BrawlerProfile): number {
         return item.id;
     }
 
@@ -266,10 +255,9 @@ export class MissionChat implements OnInit, OnDestroy {
         return isConnected ? 'Connected' : 'Connecting...';
     }
 
-    private callMembers(targets: Brawler[]) {
+    private callMembers(targets: BrawlerProfile[]) {
         if (!this.peer || !this.myStream) return;
         targets.forEach(member => {
-            // สำคัญ: พยายามโทรหา ID เพื่อนโดยไล่เช็ค Suffix หรือใช้ระบบพื้นฐาน
             const peerIdToCall = `rov-mission-${this.missionId}-user-${member.id}`;
             const call = this.peer!.call(peerIdToCall, this.myStream!);
             if (call) {

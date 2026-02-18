@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment';
 import { MissionFilter } from '../_models/mission-filter';
 import { Mission } from '../_models/mission';
 import { AddMission } from '../_models/add-mission';
-import { Brawler } from '../_models/brawler';
+import { BrawlerProfile } from '../_models/brawler';
 
 @Injectable({
   providedIn: 'root'
@@ -14,12 +14,12 @@ export class MissionService {
   private _api_url = environment.baseUrl + 'api/v1';
   private _http = inject(HttpClient);
 
-  async getLeaderboard(): Promise<Brawler[]> {
-    return lastValueFrom(this._http.get<Brawler[]>(`${this._api_url}/brawlers/leaderboard`));
+  async getLeaderboard(): Promise<BrawlerProfile[]> {
+    return lastValueFrom(this._http.get<BrawlerProfile[]>(`${this._api_url}/brawlers/leaderboard`));
   }
 
-  async getMe(): Promise<Brawler> {
-    return lastValueFrom(this._http.get<Brawler>(`${this._api_url}/brawlers/me`));
+  async getMe(): Promise<BrawlerProfile> {
+    return lastValueFrom(this._http.get<BrawlerProfile>(`${this._api_url}/brawlers/me`));
   }
 
   async getMyMissions(): Promise<Mission[]> {
@@ -71,9 +71,9 @@ export class MissionService {
     return await firstValueFrom(this._http.get<Mission>(url));
   }
 
-  async getMembers(id: number): Promise<Brawler[]> {
+  async getMembers(id: number): Promise<BrawlerProfile[]> {
     const url = `${this._api_url}/view/count/${id}`;
-    return await firstValueFrom(this._http.get<Brawler[]>(url));
+    return await firstValueFrom(this._http.get<BrawlerProfile[]>(url));
   }
 
   async getChatMessages(missionId: number): Promise<any[]> {
