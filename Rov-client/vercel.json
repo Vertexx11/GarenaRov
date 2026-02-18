@@ -1,9 +1,26 @@
 {
   "version": 2,
+  "public": true,
+  "builds": [
+    {
+      "src": "src/server.ts",
+      "use": "@vercel/node",
+      "config": {
+        "maxLambdaSize": "15mb"
+      }
+    },
+    {
+      "src": "dist/Avengers-Assembleclient/browser/**",
+      "use": "@vercel/static"
+    }
+  ],
   "routes": [
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "src/server.ts"
     }
   ]
 }

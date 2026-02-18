@@ -1,4 +1,5 @@
 export interface Brawler {
+    id: number;
     displayname: string,
     avatar: string,
     total_points: number;
@@ -7,20 +8,20 @@ export interface Brawler {
 }
 
 export interface Passport {
-    token_type:string,
-    access_token:string,
-    expires_in:number,
-    display_name:string,
-    arvatar_url?:string
+    token_type: string,
+    access_token: string,
+    expires_in: number,
+    display_name: string,
+    arvatar_url?: string
 }
 
-export interface LoginData{
-    username:string
-    password:string
+export interface LoginData {
+    username: string
+    password: string
 }
 
-export interface RegisterData{
-    username:string,
-    password:string,
-    display_name:string
+export interface RegisterData {
+    username: string,
+    password: string,
+    display_name: string
 }

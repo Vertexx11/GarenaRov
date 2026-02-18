@@ -66,9 +66,9 @@ export class MissionService {
     return await firstValueFrom(this._http.get<Mission>(url));
   }
 
-  async getMemberCount(id: number): Promise<number> {
+  async getMembers(id: number): Promise<Brawler[]> {
     const url = `${this._api_url}/view/count/${id}`;
-    return await firstValueFrom(this._http.get<number>(url));
+    return await firstValueFrom(this._http.get<Brawler[]>(url));
   }
 
   async getChatMessages(missionId: number): Promise<any[]> {
