@@ -119,4 +119,11 @@ export class Profile implements OnInit {
   }
 
 
+  getRankTitle(): string {
+    const rank = this.stats.rank;
+    if (rank === 1) return 'Challenger';
+    if (rank === 2) return 'Grandmaster';
+    if (rank === 3) return 'Master';
+    return 'Warrior';
+  }
 }

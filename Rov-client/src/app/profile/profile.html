@@ -21,7 +21,7 @@
       <div class="user-info">
         <h1 class="display-name">{{ user_data()?.display_name || 'Guest User' }}</h1>
         <p class="username">@{{ user_data()?.username || 'unknown' }}</p>
-        <span class="rank-badge">Warrior</span>
+        <span class="rank-badge">{{ getRankTitle() }}</span>
       </div>
     </div>
 
