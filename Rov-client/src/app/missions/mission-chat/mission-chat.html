@@ -1,90 +1,27 @@
-<div class="chat-container">
-    <div class="header">
-        <div class="header-content">
-            <h1>{{ mission?.name || 'Joining Channel...' }}</h1>
-            <div class="channel-status">
-                <span class="status-dot live"></span>
-                Voice Room Live
+<div class="mission-chat-container">
+    <div class="participants-list">
+        <div *ngFor="let member of members; trackBy: trackById" class="participant-card">
+            <div class="participant-avatar">
+                <img [src]="member.avatar_url || 'assets/default-avatar.png'" alt="avatar">
             </div>
-        </div>
-        <div class="members-pill">
-            <span class="material-icons" style="font-size: 16px;">people</span>
-            {{ memberCount }} Online
+            
+            <div class="participant-name">{{ member.display_name }}</div>
+            
+            <div class="participant-status">
+                <span [class.online]="getMemberStatus(member.id) === 'Connected'">
+                    {{ getMemberStatus(member.id) }}
+                </span>
+            </div>
         </div>
     </div>
 
-    <!-- Voice Participants Grid -->
-    <div class="voice-grid">
-        <!-- Self Participant Card -->
-        <div class="voice-card self" [class.talking]="isTalking">
-            <div class="avatar-wrapper">
-                <div class="avatar-large">
-                    @if (passport()?.user?.avatar_url || passport()?.avatar_url) {
-                    <img [src]="passport()?.user?.avatar_url || passport()?.avatar_url" alt="Avatar" class="avatar-img">
-                    } @else {
-                    {{ passport()?.user?.display_name?.charAt(0) }}
-                    }
-                </div>
-                <div class="status-indicator" *ngIf="isMuted || isDeafened">
-                    <span *ngIf="isMuted && !isDeafened" class="material-icons"
-                        style="font-size: 18px; color: white;">mic_off</span>
-                    <span *ngIf="isDeafened" class="material-icons"
-                        style="font-size: 18px; color: white;">headset_off</span>
-                </div>
-            </div>
-            <div class="participant-name">{{ passport()?.user?.display_name }}</div>
-            <div class="connection-status">{{ isTalking ? 'Speaking' : 'Connected' }}</div>
-        </div>
-
-        <!-- Other Members -->
-        <ng-container *ngFor="let member of members; trackBy: trackById">
-            <div class="voice-card" *ngIf="member.id !== passport()?.user?.id">
-                <div class="avatar-wrapper">
-                    <div class="avatar-large">
-                        @if (member.avatar_url) {
-                        <img [src]="member.avatar_url" alt="Avatar" class="avatar-img">
-                        } @else {
-                        {{ member.display_name?.charAt(0) }}
-                        }
-                    </div>
-                </div>
-                <div class="participant-name">{{ member.displayname }}</div>
-                <div class="connection-status">{{ getMemberStatus(member.id) }}</div>
-            </div>
-        </ng-container>
-
-    </div>
-
-    <!-- Voice Control Bar -->
     <div class="voice-controls">
-        <div class="user-info">
-            <div class="avatar-small">
-                @if (passport()?.user?.avatar_url || passport()?.avatar_url) {
-                <img [src]="passport()?.user?.avatar_url || passport()?.avatar_url" alt="Avatar"
-                    class="avatar-img-small">
-                } @else {
-                {{ passport()?.user?.display_name?.charAt(0) }}
-                }
-            </div>
-            <div class="user-details">
-                <span class="name">{{ passport()?.user?.display_name }}</span>
-                <span class="status">Voice Connected</span>
-            </div>
-        </div>
-
-        <div class="control-buttons">
-            <button class="control-btn" [class.danger]="isMuted" (click)="toggleMic()"
-                [title]="isMuted ? 'Unmute' : 'Mute'">
-                <span class="material-icons">{{ isMuted ? 'mic_off' : 'mic' }}</span>
-            </button>
-            <button class="control-btn" [class.danger]="isDeafened" (click)="toggleDeafen()"
-                [title]="isDeafened ? 'Undeafen' : 'Deafen'">
-                <span class="material-icons">{{ isDeafened ? 'headset_off' : 'headphones' }}</span>
-            </button>
-
-            <button class="disconnect-btn" (click)="disconnect()" title="Disconnect">
-                <span class="material-icons">call_end</span>
-            </button>
-        </div>
+        <button (click)="toggleMic()" [class.active]="!isMuted">
+            {{ isMuted ? 'Unmute' : 'Mute' }}
+        </button>
+        <button (click)="toggleDeafen()" [class.active]="isDeafened">
+            {{ isDeafened ? 'Undeafen' : 'Deafen' }}
+        </button>
+        <button (click)="disconnect()" class="btn-exit">Leave Mission</button>
     </div>
 </div>
