@@ -74,9 +74,7 @@
         <span class="created-date">{{ mission.created_at | date:'MMM d, HH:mm' }}</span>
 
         @if (isJoined(mission.id)) {
-        <button class="join-btn chat-mode" (click)="openChat(mission.id)">
-          <span class="material-icons">headset_mic</span> Voice Team
-        </button>
+        <button class="join-btn joined" disabled>Joined</button>
         } @else if (mission.crew_count >= (mission.max_crew || 3)) {
         <button class="join-btn full" disabled>Full</button>
         } @else {

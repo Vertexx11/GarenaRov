@@ -126,9 +126,6 @@ export class MissionManager implements OnInit {
     }
   }
 
-  onChat(mission: Mission) {
-    this._router.navigate(['/missions', mission.id, 'chat']);
-  }
 
   async onStart(mission: Mission) {
     if (mission.status !== 'Open') return;

@@ -55,9 +55,6 @@
           <button class="icon-btn delete" (click)="onDelete(mission)" title="Delete">
             <span class="material-icons">delete</span>
           </button>
-          <button class="icon-btn chat" (click)="onChat(mission)" title="Voice Team">
-            <span class="material-icons">headset_mic</span>
-          </button>
         </div>
       </div>
 
@@ -146,9 +143,6 @@
       <div class="card-footer">
         <span class="created-date">Joined: {{ mission.created_at | date:'MMM d' }}</span>
         <div class="action-row">
-          <button class="chat-btn" (click)="onChat(mission)">
-            <span class="material-icons">headset_mic</span> Voice Team
-          </button>
           <button class="leave-btn" (click)="onLeave(mission)">
             Leave Mission
           </button>

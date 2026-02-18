@@ -8,7 +8,7 @@ import { Missions } from './missions/missions';
 import { MissionManager } from './missions/mission-manager/mission-manager';
 import { authGuard } from './_guard/auth-guard';
 import { LeaderboardComponent } from './leaderboard/leaderboard';
-import { MissionChat } from './missions/mission-chat/mission-chat';
+
 
 
 export const routes: Routes = [
@@ -20,11 +20,6 @@ export const routes: Routes = [
         component: MissionManager,
         runGuardsAndResolvers: 'always',
         canActivate: [authGuard]
-    },
-    {
-        path: 'missions/:id/chat',
-        component: MissionChat,
-        runGuardsAndResolvers: 'always'
     },
     {
         path: 'missions',

@@ -102,7 +102,6 @@ export class Missions implements OnInit {
   private handleJoinSuccess(id: number) {
     this.saveJoinedToLocal(id);
     alert('✅ Join Success! เข้าร่วมภารกิจสำเร็จ');
-    this._router.navigate(['/missions', id, 'chat']);
   }
 
   private saveJoinedToLocal(id: number) {
@@ -121,9 +120,6 @@ export class Missions implements OnInit {
     return joinedIds.includes(id);
   }
 
-  openChat(id: number) {
-    this._router.navigate(['/missions', id, 'chat']);
-  }
 
   getStatusLabel(status: string): string {
     switch (status) {
