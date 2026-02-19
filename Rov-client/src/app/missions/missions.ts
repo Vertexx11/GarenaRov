@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, OnDestroy, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { Subscription, BehaviorSubject, timer, from } from 'rxjs';
+import { Subscription, BehaviorSubject, timer, from, of } from 'rxjs'; // ✅ เพิ่ม of
 import { switchMap, map, tap, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -33,6 +33,8 @@ export class Missions implements OnInit, OnDestroy {
 
   isLoading = true;
   private _pollSubscription: Subscription | undefined;
+  
+  // ใช้ Subject เพื่อสั่ง Trigger การโหลดใหม่ (ทั้ง Auto และ Manual)
   private refresh$ = new BehaviorSubject<void>(undefined);
 
   missions: Mission[] = [];
@@ -58,21 +60,32 @@ export class Missions implements OnInit, OnDestroy {
 
   private startPolling() {
     this._pollSubscription = this.refresh$.pipe(
-      // When filter changes (refresh$ emits), restart the timer
-      // timer(0, 3000) emits 0 immediately, then every 3s
-      switchMap(() => timer(0, 3000)),
+      // เมื่อมีการสั่ง refresh (หรือเริ่มทำงาน) ให้เริ่มนับเวลาใหม่
+      // timer(0, 5000) คือเริ่มทันที (0) และทำซ้ำทุก 5 วินาที
+      switchMap(() => timer(0, 5000)),
+      
       switchMap(() => {
         // Fetch data
         return from(this._missionService.gets(this.filter)).pipe(
           catchError(err => {
             console.error('Polling error:', err);
-            return []; // Return empty on error to keep stream alive
+            return of([]); // ✅ ใช้ of([]) เพื่อส่งอาเรย์ว่างกลับไป แทนที่จะ error แตก
           })
         );
       }),
-      tap(() => this.isLoading = false), // Stop loading spinner after first fetch
-      map(results => this.processMissionData(results))
+      
+      tap(() => {
+        // ✅ ปิด Loading ทันทีที่ได้ข้อมูลชุดแรกมา (ไม่ว่าจะว่างหรือไม่ก็ตาม)
+        if (this.isLoading) this.isLoading = false;
+      }),
+
+      map(results => {
+        // ✅ แก้บั๊ก: ของเดิมถ้า results ว่าง มัน return null ทำให้หน้าจอไม่เคลียร์ค่าเก่า
+        // ของใหม่: ส่งไป process เสมอ เพื่อให้หน้าจออัปเดตว่าเป็น "ไม่พบข้อมูล"
+        return this.processMissionData(results || []);
+      })
     ).subscribe(filteredMissions => {
+      // อัปเดตข้อมูลเข้าตัวแปร missions เพื่อแสดงผล
       this.missions = filteredMissions;
     });
   }
@@ -84,6 +97,7 @@ export class Missions implements OnInit, OnDestroy {
       this.missions = this.processMissionData(results);
     } catch (error) {
       console.error('SSR Fetch error:', error);
+      this.missions = []; // ถ้า Error ให้เคลียร์เป็นว่าง
     } finally {
       this.isLoading = false;
     }
@@ -105,6 +119,7 @@ export class Missions implements OnInit, OnDestroy {
       return isNotMyOwn && isNotJoined && isOpen && isNotFull;
     });
   }
+
   async loadLeaderboard() {
     try {
       const data = await this._missionService.getLeaderboard();
@@ -114,12 +129,13 @@ export class Missions implements OnInit, OnDestroy {
     }
   }
 
-  // --- โค้ดเดิมของคุณ (ห้ามลบ) ---
   get myUserId(): number {
     return this._passportService.data()?.user?.id || 0;
   }
 
   onSubmit() {
+    // ✅ ถูกต้อง: ไม่มีการสั่ง isLoading = true หน้าจะไม่กระพริบ
+    // แค่สั่งให้ reset timer และดึงข้อมูลใหม่ทันที
     this.refresh$.next();
   }
 
@@ -135,9 +151,12 @@ export class Missions implements OnInit, OnDestroy {
     try {
       await this._missionService.join(id);
       this.handleJoinSuccess(id);
+      // ✅ แนะนำ: หลัง Join เสร็จ ให้ดึงข้อมูลใหม่ทันทีเพื่อให้ปุ่มเปลี่ยนสถานะ
+      this.refresh$.next(); 
     } catch (error: any) {
       if (error.status === 404 || error.status === 200) {
         this.handleJoinSuccess(id);
+        this.refresh$.next();
       } else {
         const msg = typeof error.error === 'string' ? error.error : 'เกิดข้อผิดพลาดในการเข้าร่วม';
         alert(msg);
@@ -165,7 +184,6 @@ export class Missions implements OnInit, OnDestroy {
     const joinedIds = JSON.parse(localStorage.getItem('my_joined_missions') || '[]') as any[];
     return joinedIds.includes(id);
   }
-
 
   getStatusLabel(status: string): string {
     switch (status) {
