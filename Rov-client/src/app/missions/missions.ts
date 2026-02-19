@@ -120,9 +120,6 @@ export class Missions implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-    // When user changes filter, trigger refresh
-    // This resets the timer and fetches immediately
-    this.isLoading = true; // Show loading for manual filter change
     this.refresh$.next();
   }
 
