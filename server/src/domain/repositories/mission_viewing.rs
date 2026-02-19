@@ -9,7 +9,10 @@ use crate::domain::{
 pub trait MissionViewingRepository {
     async fn crew_counting(&self, mission_id: i32) -> Result<i64>;
     async fn get_one(&self, mission_id: i32) -> Result<MissionEntity>;
-    async fn get_all(&self, mission_filter: &MissionFilter) -> Result<Vec<MissionEntity>>;
+    async fn get_all(
+        &self,
+        mission_filter: &MissionFilter,
+    ) -> Result<Vec<(MissionEntity, i64)>>;
     async fn get_mission_count(&self, mission_id: i32) -> Result<Vec<BrawlerModel>>;
     async fn get_daily_interaction_count(&self, brawler_id: i32) -> Result<i64>;
     async fn get_daily_earned_points(&self, brawler_id: i32) -> Result<i64>;
