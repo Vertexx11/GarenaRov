@@ -51,14 +51,17 @@ impl MissionViewingRepository for MissionViewingPostgres {
         Ok(result)
     }
 
-    async fn get_all(&self, mission_filter: &MissionFilter) -> Result<Vec<MissionEntity>> {
+    async fn get_all(
+        &self,
+        mission_filter: &MissionFilter,
+    ) -> Result<Vec<(MissionEntity, i64)>> {
         let mut conn = Arc::clone(&self.db_pool).get()?;
 
         let mut query = missions::table
+            .left_join(crew_memberships::table)
             .filter(missions::deleted_at.is_null())
             .into_boxed();
 
-        // 👇 เพิ่มตรงนี้ครับ! (สำคัญสำหรับหน้า My Missions)
         if let Some(chief_id) = mission_filter.chief_id {
             query = query.filter(missions::chief_id.eq(chief_id));
         }
@@ -71,10 +74,19 @@ impl MissionViewingRepository for MissionViewingPostgres {
             query = query.filter(missions::name.ilike(format!("%{}%", name)));
         };
 
+        if let (Some(page), Some(limit)) = (mission_filter.page, mission_filter.limit) {
+            let offset = (page - 1) * limit;
+            query = query.limit(limit).offset(offset);
+        }
+
         let value = query
-            .select(MissionEntity::as_select())
+            .group_by(missions::id)
+            .select((
+                MissionEntity::as_select(),
+                diesel::dsl::count(crew_memberships::brawler_id),
+            ))
             .order_by(missions::created_at.desc())
-            .load::<MissionEntity>(&mut conn)?;
+            .load::<(MissionEntity, i64)>(&mut conn)?;
 
         Ok(value)
     }
