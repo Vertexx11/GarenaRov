@@ -2,7 +2,6 @@ import { Injectable, inject } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { Observable, throwError } from 'rxjs';
-import { ok } from 'assert/strict';
 
 @Injectable({
   providedIn: 'root'
@@ -14,10 +13,19 @@ export class ErrorService {
 
   private _snackBarConfig: MatSnackBarConfig = {
     horizontalPosition: 'right',
-    verticalPosition: 'top'
+    verticalPosition: 'top',
+    duration: 3000 // เพิ่ม duration ให้มันหายเองได้
   };
 
   handleError(error: any): Observable<never> {
+    
+    // ✅ 1. เช็คก่อนเลยว่า Error มาจาก URL ไหน?
+    const url = error.url || '';
+    
+    // ✅ 2. ถ้ามาจาก 'view/gets' (Polling) ห้ามเปลี่ยนหน้าเด็ดขาด!
+    // เพราะมันทำงานเบื้องหลัง ถ้าเปลี่ยนหน้า user จะรำคาญ
+    const isPolling = url.includes('view/gets');
+
     if (error) {
       switch (error.status) {
         case 400:
@@ -26,10 +34,12 @@ export class ErrorService {
 
         case 401:
           this._snackBar.open('Invalid username or password', 'ok', this._snackBarConfig);
+          // ปกติ 401 อาจจะต้อง Redirect ไป Login แต่ถ้า Polling อาจจะแค่แจ้งเตือนก็ได้
           break;
 
         case 404:
-          if (error.url && error.url.includes('join')) {
+          if (url.includes('join') || isPolling) {
+            console.warn('API 404 ignored for polling/join');
             break;
           }
           this._router.navigate(['/not-found']);
@@ -47,14 +57,21 @@ export class ErrorService {
         case 509:
         case 510:
         case 511:
+          if (isPolling) {
+            console.error('Polling Server Error (Ignored navigation):', error.status);
+            break; 
+          }
+
           const navExtra: NavigationExtras = {
-            state: { error: error.error } 
+            state: { error: error.error }
           };
           this._router.navigate(['/server-error'], navExtra);
           break;
 
         default:
-          this._snackBar.open('something unexpected happened. please try again later.', 'ok', this._snackBarConfig);
+          if (!isPolling) {
+             this._snackBar.open('something unexpected happened. please try again later.', 'ok', this._snackBarConfig);
+          }
           break;
       }
     }

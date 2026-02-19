@@ -33,7 +33,7 @@ export class Missions implements OnInit, OnDestroy {
 
   isLoading = true;
   private _pollSubscription: Subscription | undefined;
-  
+
   // ใช้ Subject เพื่อสั่ง Trigger การโหลดใหม่ (ทั้ง Auto และ Manual)
   private refresh$ = new BehaviorSubject<void>(undefined);
 
@@ -63,7 +63,7 @@ export class Missions implements OnInit, OnDestroy {
       // เมื่อมีการสั่ง refresh (หรือเริ่มทำงาน) ให้เริ่มนับเวลาใหม่
       // timer(0, 5000) คือเริ่มทันที (0) และทำซ้ำทุก 5 วินาที
       switchMap(() => timer(0, 5000)),
-      
+
       switchMap(() => {
         // Fetch data
         return from(this._missionService.gets(this.filter)).pipe(
@@ -73,7 +73,7 @@ export class Missions implements OnInit, OnDestroy {
           })
         );
       }),
-      
+
       tap(() => {
         // ✅ ปิด Loading ทันทีที่ได้ข้อมูลชุดแรกมา (ไม่ว่าจะว่างหรือไม่ก็ตาม)
         if (this.isLoading) this.isLoading = false;
@@ -152,7 +152,7 @@ export class Missions implements OnInit, OnDestroy {
       await this._missionService.join(id);
       this.handleJoinSuccess(id);
       // ✅ แนะนำ: หลัง Join เสร็จ ให้ดึงข้อมูลใหม่ทันทีเพื่อให้ปุ่มเปลี่ยนสถานะ
-      this.refresh$.next(); 
+      this.refresh$.next();
     } catch (error: any) {
       if (error.status === 404 || error.status === 200) {
         this.handleJoinSuccess(id);
