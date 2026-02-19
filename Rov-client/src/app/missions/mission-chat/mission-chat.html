@@ -1,91 +1,100 @@
-<div class="mission-container">
-
-  <div class="mission-header-card">
-    <div class="header-left">
-      <h1>Mission Control</h1>
-      <p>Select a mission to join and earn rewards.</p>
+<div class="header">
+    <h1>{{ mission?.name || 'Voice Channel' }}</h1>
+    <div class="channel-status">
+        <span class="status-dot" [style.background]="connectionStatus === 'connected' ? '#4ade80' : '#d1d5db'"></span>
+        {{ connectionStatus === 'connected' ? 'Voice Connected' : 'Not Connected' }}
     </div>
+</div>
 
-    <form (submit)="$event.preventDefault()" class="search-controls">
-      <div class="search-input-wrapper">
-        <i class="fa-solid fa-search search-icon"></i>
-        <input type="text" name="search" [(ngModel)]="filter.name" (ngModelChange)="onSubmit()"
-          placeholder="Search missions..." class="modern-input">
-      </div>
+<!-- Join Screen -->
+<div class="join-screen" *ngIf="connectionStatus === 'idle' || connectionStatus === 'error'">
+    <div class="join-card">
+        <div class="icon-circle">
+            <i class="fa-solid fa-headset"></i>
+        </div>
+        <h2>Ready to join?</h2>
+        <p>Connect to voice channel to talk with your team.</p>
 
-      <button type="button" (click)="onSubmit()" class="refresh-btn">
-        <span class="material-icons">refresh</span>
-      </button>
-    </form>
-  </div>
+        <p class="error-msg" *ngIf="errorMessage">
+            <i class="fa-solid fa-circle-exclamation"></i> {{ errorMessage }}
+        </p>
 
-  @if (isLoading && missions.length === 0) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading missions...</p>
+        <button class="join-btn-large" (click)="joinVoiceChannel()">
+            Join Voice Channel
+        </button>
     </div>
-  } @else {
-    <div class="mission-grid">
-      @for (mission of missions; track mission.id) {
-      <div class="mission-card" [ngClass]="getDifficultyClass(mission.difficulty)">
+</div>
 
-        <div class="card-header">
-          <div class="mission-badges">
-            <span class="id-badge">#{{ mission.id }}</span>
-            <span class="difficulty-badge" [ngClass]="getDifficultyClass(mission.difficulty)">
-              {{ mission.difficulty || 'NORMAL' }}
-            </span>
-          </div>
-          <span class="status-badge" [ngClass]="mission.status.toLowerCase()">{{ mission.status }}</span>
-        </div>
+<!-- Loading Screen -->
+<div class="loading-screen" *ngIf="connectionStatus === 'connecting'">
+    <div class="spinner"></div>
+    <p>Connecting to voice server...</p>
+</div>
 
-        <h3 class="mission-title">{{ mission.name }}</h3>
-        <p class="mission-desc">{{ mission.description || 'No description provided.' }}</p>
-
-        <div class="mission-meta">
-          <div class="meta-item points">
-            <span class="material-icons">emoji_events</span>
-            <span>{{ mission.base_points || 0 }} pts</span>
-          </div>
-
-          <div class="meta-item chief">
-            <span class="material-icons">manage_accounts</span>
-            <span>Chief {{ mission.chief_id }}</span>
-          </div>
-        </div>
-
-        <div class="crew-progress">
-          <div class="progress-label">
-            <span>Crew</span>
-            <span>{{ mission.crew_count }} / {{ mission.max_crew || 3 }}</span>
-          </div>
-          <div class="progress-bar-bg">
-            <div class="progress-bar-fill" [style.width.%]="((mission.crew_count || 0) / (mission.max_crew || 3)) * 100">
+<!-- Connected Grid -->
+<div class="voice-grid" *ngIf="connectionStatus === 'connected'">
+    <!-- Self User Card -->
+    <div class="voice-card" [class.talking]="isTalking && !isMuted">
+        <div class="avatar-wrapper">
+            <div class="avatar-large">
+                <img [src]="passport()?.user?.avatar_url || 'assets/default-avatar.png'" alt="My Avatar"
+                    class="avatar-img">
             </div>
-          </div>
+            <!-- Status Indicators -->
+            <div class="status-indicator muted" *ngIf="isMuted">
+                <i class="fa-solid fa-microphone-slash"></i>
+            </div>
         </div>
 
-        <div class="card-footer">
-          <span class="created-date">{{ mission.created_at | date:'MMM d, HH:mm' }}</span>
-
-          @if (isJoined(mission.id)) {
-            <button type="button" class="join-btn joined" disabled>Joined</button>
-          } @else if (mission.crew_count >= (mission.max_crew || 3)) {
-            <button type="button" class="join-btn full" disabled>Full</button>
-          } @else {
-            <button type="button" class="join-btn" (click)="joinMission(mission.id)">
-              Join Mission
-            </button>
-          }
-        </div>
-
-      </div>
-      } @empty {
-        <div class="no-data-state">
-          <span class="material-icons">search_off</span>
-          <p>No missions found matching your criteria.</p>
-        </div>
-      }
+        <span class="participant-name">{{ passport()?.user?.display_name || 'Me' }}</span>
+        <span class="connection-status">Connected</span>
     </div>
-  }
+
+    <!-- Other Members -->
+    <ng-container *ngFor="let member of members; trackBy: trackById">
+        <div class="voice-card" [class.talking]="false"> <!-- Ideally we would detect their talking state too -->
+            <div class="avatar-wrapper">
+                <div class="avatar-large">
+                    <img [src]="member.avatar_url || 'assets/default-avatar.png'" [alt]="member.display_name"
+                        class="avatar-img">
+                </div>
+            </div>
+
+            <span class="participant-name">{{ member.display_name }}</span>
+            <span class="connection-status">{{ getMemberStatus(member.id) }}</span>
+        </div>
+    </ng-container>
+</div>
+
+<!-- Voice Controls (visible when connected) -->
+<div class="voice-controls" *ngIf="connectionStatus === 'connected'">
+
+    <!-- User Info (Bottom Left) -->
+    <div class="user-info">
+        <div class="avatar-small">
+            <img [src]="passport()?.user?.avatar_url || 'assets/default-avatar.png'" alt="User"
+                class="avatar-img-small">
+        </div>
+        <div class="user-details">
+            <div class="name">{{ passport()?.user?.display_name }}</div>
+            <div class="status">#{{ passport()?.user?.username || passport()?.user?.id }}</div>
+        </div>
+    </div>
+
+    <!-- Action Buttons (Bottom Right) -->
+    <div class="control-buttons">
+        <button class="control-btn" [class.muted-active]="isMuted" (click)="toggleMic()"
+            [title]="isMuted ? 'Unmute' : 'Mute'">
+            <i class="fa-solid" [class.fa-microphone-slash]="isMuted" [class.fa-microphone]="!isMuted"></i>
+        </button>
+
+        <button class="control-btn" [class.muted-active]="isDeafened" (click)="toggleDeafen()"
+            [title]="isDeafened ? 'Undeafen' : 'Deafen'">
+            <i class="fa-solid" [class.fa-headset]="!isDeafened" [class.fa-ban]="isDeafened"></i>
+        </button>
+
+        <button class="disconnect-btn" (click)="disconnect()" title="Disconnect">
+            <i class="fa-solid fa-phone-slash"></i>
+        </button>
+    </div>
 </div>

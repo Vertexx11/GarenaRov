@@ -1,6 +1,5 @@
 <div class="mission-container">
 
-  <!-- Search/Filter Header -->
   <div class="mission-header-card">
     <div class="header-left">
       <h1>Mission Control</h1>
@@ -20,75 +19,73 @@
     </form>
   </div>
 
-  <!-- Mission Grid -->
-  <!-- Mission Grid -->
   @if (isLoading && missions.length === 0) {
-  <div class="loading-state">
-    <div class="spinner"></div>
-    <p>Loading missions...</p>
-  </div>
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading missions...</p>
+    </div>
   } @else {
-  <div class="mission-grid">
-    @for (mission of missions; track mission.id) {
-    <div class="mission-card" [ngClass]="getDifficultyClass(mission.difficulty)">
+    <div class="mission-grid">
+      @for (mission of missions; track mission.id) {
+      <div class="mission-card" [ngClass]="getDifficultyClass(mission.difficulty)">
 
-      <div class="card-header">
-        <div class="mission-badges">
-          <span class="id-badge">#{{ mission.id }}</span>
-          <span class="difficulty-badge" [ngClass]="getDifficultyClass(mission.difficulty)">
-            {{ mission.difficulty || 'NORMAL' }}
-          </span>
-        </div>
-        <span class="status-badge" [ngClass]="mission.status.toLowerCase()">{{ mission.status }}</span>
-      </div>
-
-      <h3 class="mission-title">{{ mission.name }}</h3>
-      <p class="mission-desc">{{ mission.description || 'No description provided.' }}</p>
-
-      <div class="mission-meta">
-        <div class="meta-item points">
-          <span class="material-icons">emoji_events</span>
-          <span>{{ mission.base_points || 0 }} pts</span>
+        <div class="card-header">
+          <div class="mission-badges">
+            <span class="id-badge">#{{ mission.id }}</span>
+            <span class="difficulty-badge" [ngClass]="getDifficultyClass(mission.difficulty)">
+              {{ mission.difficulty || 'NORMAL' }}
+            </span>
+          </div>
+          <span class="status-badge" [ngClass]="mission.status.toLowerCase()">{{ mission.status }}</span>
         </div>
 
-        <div class="meta-item chief">
-          <span class="material-icons">manage_accounts</span>
-          <span>Chief {{ mission.chief_id }}</span>
-        </div>
-      </div>
+        <h3 class="mission-title">{{ mission.name }}</h3>
+        <p class="mission-desc">{{ mission.description || 'No description provided.' }}</p>
 
-      <div class="crew-progress">
-        <div class="progress-label">
-          <span>Crew</span>
-          <span>{{ mission.crew_count }} / {{ mission.max_crew || 3 }}</span>
-        </div>
-        <div class="progress-bar-bg">
-          <div class="progress-bar-fill" [style.width.%]="((mission.crew_count || 0) / (mission.max_crew || 3)) * 100">
+        <div class="mission-meta">
+          <div class="meta-item points">
+            <span class="material-icons">emoji_events</span>
+            <span>{{ mission.base_points || 0 }} pts</span>
+          </div>
+
+          <div class="meta-item chief">
+            <span class="material-icons">manage_accounts</span>
+            <span>Chief {{ mission.chief_id }}</span>
           </div>
         </div>
+
+        <div class="crew-progress">
+          <div class="progress-label">
+            <span>Crew</span>
+            <span>{{ mission.crew_count }} / {{ mission.max_crew || 3 }}</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" [style.width.%]="((mission.crew_count || 0) / (mission.max_crew || 3)) * 100">
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <span class="created-date">{{ mission.created_at | date:'MMM d, HH:mm' }}</span>
+
+          @if (isJoined(mission.id)) {
+            <button type="button" class="join-btn joined" disabled>Joined</button>
+          } @else if (mission.crew_count >= (mission.max_crew || 3)) {
+            <button type="button" class="join-btn full" disabled>Full</button>
+          } @else {
+            <button type="button" class="join-btn" (click)="joinMission(mission.id)">
+              Join Mission
+            </button>
+          }
+        </div>
+
       </div>
-
-      <div class="card-footer">
-        <span class="created-date">{{ mission.created_at | date:'MMM d, HH:mm' }}</span>
-
-        @if (isJoined(mission.id)) {
-        <button class="join-btn joined" disabled>Joined</button>
-        } @else if (mission.crew_count >= (mission.max_crew || 3)) {
-        <button class="join-btn full" disabled>Full</button>
-        } @else {
-        <button class="join-btn" (click)="joinMission(mission.id)">
-          Join Mission
-        </button>
-        }
-      </div>
-
+      } @empty {
+        <div class="no-data-state">
+          <span class="material-icons">search_off</span>
+          <p>No missions found matching your criteria.</p>
+        </div>
+      }
     </div>
-    } @empty {
-    <div class="no-data-state">
-      <span class="material-icons">search_off</span>
-      <p>No missions found matching your criteria.</p>
-    </div>
-    }
-  </div>
   }
 </div>
