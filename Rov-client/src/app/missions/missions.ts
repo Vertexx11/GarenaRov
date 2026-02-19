@@ -1,5 +1,7 @@
 import { Component, inject, OnInit, OnDestroy, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { Subscription, BehaviorSubject, timer, from } from 'rxjs';
+import { switchMap, map, tap, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -30,7 +32,8 @@ export class Missions implements OnInit, OnDestroy {
   };
 
   isLoading = true;
-  private _interval: any;
+  private _pollSubscription: Subscription | undefined;
+  private refresh$ = new BehaviorSubject<void>(undefined);
 
   missions: Mission[] = [];
   topBrawlers: BrawlerProfile[] = [];
@@ -38,21 +41,69 @@ export class Missions implements OnInit, OnDestroy {
   constructor() { }
 
   ngOnInit() {
+    this.loadLeaderboard();
     if (isPlatformBrowser(this._platformId)) {
-      this.onSubmit();
-      this.loadLeaderboard();
-      this._interval = setInterval(() => {
-        this.onSubmit(true); // silent update
-      }, 5000); // Increased interval to 5s to reduce load
+      this.startPolling();
     } else {
-      this.isLoading = false; // Stop loading on server immediately
+      // Server-side: fetch once without polling
+      this.fetchMissions();
     }
   }
 
   ngOnDestroy() {
-    if (this._interval) {
-      clearInterval(this._interval);
+    if (this._pollSubscription) {
+      this._pollSubscription.unsubscribe();
     }
+  }
+
+  private startPolling() {
+    this._pollSubscription = this.refresh$.pipe(
+      // When filter changes (refresh$ emits), restart the timer
+      // timer(0, 3000) emits 0 immediately, then every 3s
+      switchMap(() => timer(0, 3000)),
+      switchMap(() => {
+        // Fetch data
+        return from(this._missionService.gets(this.filter)).pipe(
+          catchError(err => {
+            console.error('Polling error:', err);
+            return []; // Return empty on error to keep stream alive
+          })
+        );
+      }),
+      tap(() => this.isLoading = false), // Stop loading spinner after first fetch
+      map(results => this.processMissionData(results))
+    ).subscribe(filteredMissions => {
+      this.missions = filteredMissions;
+    });
+  }
+
+  // Fallback for SSR
+  async fetchMissions() {
+    try {
+      const results = await this._missionService.gets(this.filter);
+      this.missions = this.processMissionData(results);
+    } catch (error) {
+      console.error('SSR Fetch error:', error);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  // Extract filtering logic
+  private processMissionData(results: Mission[]): Mission[] {
+    let joinedIds: number[] = [];
+    if (isPlatformBrowser(this._platformId)) {
+      joinedIds = JSON.parse(localStorage.getItem('my_joined_missions') || '[]');
+    }
+
+    return results.filter(m => {
+      const isNotMyOwn = m.chief_id !== this.myUserId;
+      const isNotJoined = !joinedIds.includes(m.id);
+      const isOpen = m.status === 'Open';
+      const isNotFull = m.crew_count < (m.max_crew || 3);
+
+      return isNotMyOwn && isNotJoined && isOpen && isNotFull;
+    });
   }
   async loadLeaderboard() {
     try {
@@ -68,32 +119,11 @@ export class Missions implements OnInit, OnDestroy {
     return this._passportService.data()?.user?.id || 0;
   }
 
-  async onSubmit(silent: boolean = false) {
-    if (!silent) this.isLoading = true;
-    try {
-      const results = await this._missionService.gets(this.filter);
-      let joinedIds: number[] = [];
-      if (isPlatformBrowser(this._platformId)) {
-        joinedIds = JSON.parse(localStorage.getItem('my_joined_missions') || '[]');
-      }
-
-      this.missions = results.filter(m => {
-        const isNotMyOwn = m.chief_id !== this.myUserId;
-        const isNotJoined = !joinedIds.includes(m.id);
-        const isOpen = m.status === 'Open';
-        const isNotFull = m.crew_count < (m.max_crew || 3);
-
-        // Show if it's (Not Mine AND Not Joined AND Open AND Not Full)
-        // User requested to HIDE joined and non-joinable missions from this list
-        return isNotMyOwn && isNotJoined && isOpen && isNotFull;
-      });
-
-      console.log('Search results:', this.missions);
-    } catch (error: any) {
-      console.error('Search error:', error);
-    } finally {
-      this.isLoading = false;
-    }
+  onSubmit() {
+    // When user changes filter, trigger refresh
+    // This resets the timer and fetches immediately
+    this.isLoading = true; // Show loading for manual filter change
+    this.refresh$.next();
   }
 
   async joinMission(id: number) {
