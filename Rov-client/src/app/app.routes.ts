@@ -18,18 +18,15 @@ export const routes: Routes = [
     {
         path: 'missions/my-missions',
         component: MissionManager,
-        runGuardsAndResolvers: 'always',
         canActivate: [authGuard]
     },
     {
         path: 'missions',
         component: Missions,
-        runGuardsAndResolvers: 'always'
     },
     {
         path: 'profile',
         component: Profile,
-        runGuardsAndResolvers: 'always'
     },
     { path: 'my-missions', component: MissionManager },
     { path: 'leaderboard', component: LeaderboardComponent },
