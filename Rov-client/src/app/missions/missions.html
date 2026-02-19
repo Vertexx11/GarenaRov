@@ -14,14 +14,7 @@
           class="modern-input">
       </div>
 
-      <div class="filter-select-wrapper">
-        <select [(ngModel)]="filter.status" (ngModelChange)="onSubmit()" class="modern-select">
-          <option [ngValue]="undefined">All Status</option>
-          <option value="Open">Open</option>
-          <option value="InProgress">In Progress</option>
-          <option value="Completed">Completed</option>
-        </select>
-      </div>
+
 
       <button (click)="onSubmit()" class="refresh-btn">
         <span class="material-icons">refresh</span>

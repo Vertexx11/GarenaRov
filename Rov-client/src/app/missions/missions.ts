@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -19,15 +19,17 @@ import { BrawlerProfile } from '../_models/brawler';
   templateUrl: './missions.html',
   styleUrl: './missions.css',
 })
-export class Missions implements OnInit {
+export class Missions implements OnInit, OnDestroy {
   private _missionService = inject(MissionService);
   private _passportService = inject(PassportService);
   private _router = inject(Router);
   private _platformId = inject(PLATFORM_ID);
 
   filter: MissionFilter = {
-    status: undefined
+    status: 'Open'
   };
+
+  private _interval: any;
 
   missions: Mission[] = [];
   topBrawlers: BrawlerProfile[] = [];
@@ -37,6 +39,17 @@ export class Missions implements OnInit {
   ngOnInit() {
     this.onSubmit();
     this.loadLeaderboard();
+    if (isPlatformBrowser(this._platformId)) {
+      this._interval = setInterval(() => {
+        this.onSubmit();
+      }, 2000);
+    }
+  }
+
+  ngOnDestroy() {
+    if (this._interval) {
+      clearInterval(this._interval);
+    }
   }
   async loadLeaderboard() {
     try {
@@ -63,10 +76,12 @@ export class Missions implements OnInit {
       this.missions = results.filter(m => {
         const isNotMyOwn = m.chief_id !== this.myUserId;
         const isNotJoined = !joinedIds.includes(m.id);
+        const isOpen = m.status === 'Open';
+        const isNotFull = m.crew_count < (m.max_crew || 3);
 
-        // Show if it's (Not Mine AND Not Joined)
-        // User requested to HIDE joined missions from this list
-        return isNotMyOwn && isNotJoined;
+        // Show if it's (Not Mine AND Not Joined AND Open AND Not Full)
+        // User requested to HIDE joined and non-joinable missions from this list
+        return isNotMyOwn && isNotJoined && isOpen && isNotFull;
       });
 
       console.log('Search results:', this.missions);
