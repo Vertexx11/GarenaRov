@@ -187,6 +187,8 @@ export class MissionManager implements OnInit {
       }
 
       this.joinedMissions = allMissions.filter((m: any) => {
+        // Specific request to hide Mission #9
+        if (m.id === 9) return false;
         return m.chief_id != myId && joinedIds.includes(m.id);
       });
 
