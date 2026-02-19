@@ -29,6 +29,7 @@ export class Missions implements OnInit, OnDestroy {
     status: 'Open'
   };
 
+  isLoading = true;
   private _interval: any;
 
   missions: Mission[] = [];
@@ -37,12 +38,14 @@ export class Missions implements OnInit, OnDestroy {
   constructor() { }
 
   ngOnInit() {
-    this.onSubmit();
-    this.loadLeaderboard();
     if (isPlatformBrowser(this._platformId)) {
+      this.onSubmit();
+      this.loadLeaderboard();
       this._interval = setInterval(() => {
-        this.onSubmit();
-      }, 2000);
+        this.onSubmit(true); // silent update
+      }, 5000); // Increased interval to 5s to reduce load
+    } else {
+      this.isLoading = false; // Stop loading on server immediately
     }
   }
 
@@ -65,7 +68,8 @@ export class Missions implements OnInit, OnDestroy {
     return this._passportService.data()?.user?.id || 0;
   }
 
-  async onSubmit() {
+  async onSubmit(silent: boolean = false) {
+    if (!silent) this.isLoading = true;
     try {
       const results = await this._missionService.gets(this.filter);
       let joinedIds: number[] = [];
@@ -85,10 +89,10 @@ export class Missions implements OnInit, OnDestroy {
       });
 
       console.log('Search results:', this.missions);
-
-      console.log('Search results (Hidden Joined):', this.missions);
     } catch (error: any) {
       console.error('Search error:', error);
+    } finally {
+      this.isLoading = false;
     }
   }
 

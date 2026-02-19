@@ -24,6 +24,12 @@
 
   <!-- Mission Grid -->
   <div class="mission-grid">
+    @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading missions...</p>
+    </div>
+    } @else {
     @for (mission of missions; track mission.id) {
     <div class="mission-card" [ngClass]="getDifficultyClass(mission.difficulty)">
 
@@ -83,6 +89,7 @@
       <span class="material-icons">search_off</span>
       <p>No missions found matching your criteria.</p>
     </div>
+    }
     }
   </div>
 </div>

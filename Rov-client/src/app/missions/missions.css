@@ -305,3 +305,42 @@
 .no-data-state .material-icons {
   font-size: 36px;
 }
+
+/* Loading State */
+.loading-state {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+  gap: 16px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid var(--primary-accent, #4f46e5);
+  /* Fallback to indigo if var unavailable */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-state p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
