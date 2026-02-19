@@ -7,19 +7,17 @@
       <p>Select a mission to join and earn rewards.</p>
     </div>
 
-    <div class="search-controls">
+    <form (submit)="$event.preventDefault()" class="search-controls">
       <div class="search-input-wrapper">
         <i class="fa-solid fa-search search-icon"></i>
-        <input type="text" [(ngModel)]="filter.name" (ngModelChange)="onSubmit()" placeholder="Search missions..."
-          class="modern-input">
+        <input type="text" name="search" [(ngModel)]="filter.name" (ngModelChange)="onSubmit()"
+          placeholder="Search missions..." class="modern-input">
       </div>
 
-
-
-      <button (click)="onSubmit()" class="refresh-btn">
+      <button type="button" (click)="onSubmit()" class="refresh-btn">
         <span class="material-icons">refresh</span>
       </button>
-    </div>
+    </form>
   </div>
 
   <!-- Mission Grid -->
