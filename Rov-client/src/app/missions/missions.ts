@@ -166,6 +166,10 @@ export class Missions implements OnInit, OnDestroy {
 
   private handleJoinSuccess(id: number) {
     this.saveJoinedToLocal(id);
+
+    // Remove the mission from the current list immediately so it disappears
+    this.missions = this.missions.filter(m => m.id !== id);
+
     alert('✅ Join Success! เข้าร่วมภารกิจสำเร็จ');
   }
 
